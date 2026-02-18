@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://quest_data_sample"]
+
+[ext_resource type="Script" path="res://src/systems/quest/quest_component.gd" id="1dcc0c1k3h33l"]
+
+[resource]
+script = ExtResource("1dcc0c1k3h33l")
+quest_id = "quest_tutorial_001"
+quest_title = "初入江湖"
+quest_description = "刚刚踏入武林，先熟悉一下周围环境，向村里的长者问好。"
+quest_objectives = [ "与村长对话" ]
+quest_rewards = { "exp": 50, "gold": 20 }
+is_active = true
+is_completed = false
+current_objective_index = 0
+quest_progress = 0.0

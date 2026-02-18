@@ -1,0 +1,10 @@
+# Main test scene to run all game tests
+extends Control
+
+func _ready() -> void:
+	# Set up the test runner
+	var test_runner = preload("res://tests/test_runner.gd").new()
+	self.add_child(test_runner)
+
+	# Start the tests
+	print("Tests started. See console for results.")

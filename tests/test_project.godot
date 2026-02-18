@@ -1,0 +1,2 @@
+[TestRunner]
+main_scene="res://tests/test_runner.tscn"

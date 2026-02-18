@@ -1,0 +1,80 @@
+[gd_scene load_steps=2 format=3 uid="uid://16ry2f433h33l"]
+
+[sub_resource type="Script" id="16ry2f433h33l"]
+source_code = """# Test Runner for Jin Yong Qunxia Zhuan Game
+extends Control
+
+var TestHelper = preload("res://tests/helpers/test_helper.gd")
+
+func _ready() -> void:
+	print("Starting Test Suite for Jin Yong Qunxia Zhuan Game")
+
+	# Run all test suites
+	await run_unit_tests()
+	await run_integration_tests()
+
+	print("")
+	print("=========================================")
+	print("ALL TESTS COMPLETED")
+	print("=========================================")
+
+func run_unit_tests() -> void:
+	print("")
+	print("=========================================")
+	print("RUNNING UNIT TESTS")
+	print("=========================================")
+
+	# Run quest system unit tests
+	print("")
+	print("--- Running Quest System Tests ---")
+	var quest_system_test = preload("res://tests/unit/test_quest_system.gd").new()
+	add_child(quest_system_test)
+	await quest_system_test.finished  # Wait for test to finish
+
+	# Remove test node after completion
+	remove_child(quest_system_test)
+
+	# Run quest manager unit tests
+	print("")
+	print("--- Running Quest Manager Tests ---")
+	var quest_manager_test = preload("res://tests/unit/test_quest_manager.gd").new()
+	add_child(quest_manager_test)
+	await quest_manager_test.finished  # Wait for test to finish
+
+	# Remove test node after completion
+	remove_child(quest_manager_test)
+
+	# Run Jin Yong generator unit tests
+	print("")
+	print("--- Running Jin Yong Generator Tests ---")
+	var generator_test = preload("res://tests/unit/test_jin_yong_generator.gd").new()
+	add_child(generator_test)
+	await generator_test.finished  # Wait for test to finish
+
+	# Remove test node after completion
+	remove_child(generator_test)
+
+func run_integration_tests() -> void:
+	print("")
+	print("=========================================")
+	print("RUNNING INTEGRATION TESTS")
+	print("=========================================")
+
+	# Run integration tests
+	print("")
+	print("--- Running Quest System Integration Tests ---")
+	var integration_test = preload("res://tests/integration/test_quest_system_integration.gd").new()
+	add_child(integration_test)
+	await integration_test.finished  # Wait for test to finish
+
+	# Remove test node after completion
+	remove_child(integration_test)
+
+# Signal to indicate all tests in a suite are finished
+signal finished
+"""
+resource_name = "Test Runner"
+_class_icon_class = "Control"
+
+[node name="TestRunner" type="Control"]
+script = SubResource("16ry2f433h33l")

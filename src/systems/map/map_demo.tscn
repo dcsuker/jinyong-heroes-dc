@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://map_demo_unique_id"]
+
+[sub_resource type="WorldEnvironment" id="world_env"]
+environment = SubResource("env")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 1
+background_color = Color(0.137255, 0.137255, 0.235294)
+
+[node name="MapDemo" type="Node2D"]
+script = ExtResource("res://src/systems/map/map_demo.gd")
+
+[node name="MapDemoSetup" type="Node" parent="." script=ExtResource("res://src/systems/map/map_demo_setup.gd")]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("res://icon.svg")
+scale = Vector2(0.5, 0.5)

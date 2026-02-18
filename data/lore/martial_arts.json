@@ -1,0 +1,831 @@
+{
+  "martial_arts": {
+    "internal_arts": [
+      {
+        "id": "jiuyin_zhenjing",
+        "name": "九阴真经",
+        "category": "内功",
+        "tier": "SSS",
+        "description": "天下武学总纲，包含内功、剑法、掌法、轻功等诸多领域，博大精深，威力无穷",
+        "effects": {
+          "mp_regen": "+50%",
+          "hp_max": "+30%",
+          "all_stats": "+10%",
+          "learning_bonus": "所有武功学习速度+20%"
+        },
+        "prerequisites": {
+          "level_min": 30,
+          "intelligence_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "九阴内功",
+            "九阴掌法",
+            "九阴指法",
+            "九阴剑法",
+            "九阴轻功"
+          ]
+        },
+        "known_by": ["郭靖", "黄蓉", "周伯通", "欧阳锋（逆练）", "洪七公", "一灯大师", "杨过（部分）"],
+        "novel_source": "射雕英雄传"
+      },
+      {
+        "id": "jiuyang_shengong",
+        "name": "九阳神功",
+        "category": "内功",
+        "tier": "SSS",
+        "description": "源自《九阴真经》，青出于蓝而胜于蓝。练成后，内力自生之速，犹如江河奔腾，百毒不侵",
+        "effects": {
+          "mp_max": "+60%",
+          "mp_regen": "+80%",
+          "resistance_poison": "免疫所有毒素",
+          "resistance_negative": "免疫所有负面状态",
+          "hp_regen": "+40%"
+        },
+        "prerequisites": {
+          "level_min": 35,
+          "intelligence_min": 60,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "九阳纯阳",
+            "九阳护体",
+            "九阳内息"
+          ]
+        },
+        "known_by": ["张无忌", "觉远", "张三丰（部分）"],
+        "novel_source": "倚天屠龙记"
+      },
+      {
+        "id": "xiaowuxiang_gong",
+        "name": "小无相功",
+        "category": "内功",
+        "tier": "SS",
+        "description": "逍遥派内功心法，是道家之学，讲究清静无为，神游太虚，较之其他内功威力更强",
+        "effects": {
+          "mp_max": "+50%",
+          "spell_power": "+30%",
+          "illusion_resistance": "+50%",
+          "imitate_skill": "可模仿少林七十二绝技"
+        },
+        "prerequisites": {
+          "level_min": 25,
+          "intelligence_min": 80,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "小无相心法",
+            "小无相真气"
+          ]
+        },
+        "known_by": ["虚竹", "鸠摩智", "李秋水", "无崖子"],
+        "novel_source": "天龙八部"
+      },
+      {
+        "id": "qiankun_danuoyi",
+        "name": "乾坤大挪移",
+        "category": "内功",
+        "tier": "SS",
+        "description": "明教护教神功，可借力打力，转移敌人攻击，威力无穷",
+        "effects": {
+          "dodge_rate": "+40%",
+          "counter_damage": "+60%",
+          "energy_transfer": "可转移敌人内力",
+          "parry_bonus": "+30%"
+        },
+        "prerequisites": {
+          "level_min": 40,
+          "intelligence_min": 75,
+          "agility_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "乾坤一掷",
+            "乾坤流转",
+            "乾坤借力"
+          ]
+        },
+        "known_by": ["张无忌", "阳顶天", "杨逍"],
+        "novel_source": "倚天屠龙记"
+      },
+      {
+        "id": "beiming_shengong",
+        "name": "北冥神功",
+        "category": "内功",
+        "tier": "S",
+        "description": "可吸取他人内力为己用，威力惊人但风险极大",
+        "effects": {
+          "absorb_mana": "可吸取敌人内力",
+          "mp_max_growth": "无上限成长",
+          "drain_damage": "吸取造成伤害"
+        },
+        "prerequisites": {
+          "level_min": 20,
+          "intelligence_min": 85,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "北冥真气",
+            "吸功大法"
+          ]
+        },
+        "known_by": ["段誉", "无崖子", "丁春秋"],
+        "novel_source": "天龙八部"
+      },
+      {
+        "id": "longxiang_banruo",
+        "name": "龙象般若功",
+        "category": "内功",
+        "tier": "SS",
+        "description": "西藏密宗绝学，练至高深境界威力惊人，每一层功力倍增，共十三层",
+        "effects": {
+          "hp_max": "+50%",
+          "attack": "+40%",
+          "defense": "+30%",
+          "physical_damage": "+50%"
+        },
+        "prerequisites": {
+          "level_min": 30,
+          "strength_min": 80,
+          "constitution_min": 75,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "龙象真气",
+            "龙象护体"
+          ]
+        },
+        "known_by": ["金轮法王"],
+        "novel_source": "神雕侠侣"
+      },
+      {
+        "id": "taiji_qigong",
+        "name": "太极气功",
+        "category": "内功",
+        "tier": "S",
+        "description": "武当派镇派内功，以柔克刚，四两拨千斤",
+        "effects": {
+          "defense": "+40%",
+          "counter_rate": "+50%",
+          "damage_reduction": "+30%",
+          "qi_recovery": "+60%"
+        },
+        "prerequisites": {
+          "level_min": 25,
+          "intelligence_min": 70,
+          "constitution_min": 65,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "太极心法",
+            "太极真气"
+          ]
+        },
+        "known_by": ["张三丰", "张无忌", "武当七侠"],
+        "novel_source": "倚天屠龙记"
+      },
+      {
+        "id": "xixing_dafa",
+        "name": "吸星大法",
+        "category": "内功",
+        "tier": "S",
+        "description": "魔教武功，可吸取他人内力，但有反噬风险",
+        "effects": {
+          "absorb_mana": "可吸取敌人内力",
+          "mp_max": "+40%",
+          "spell_power": "+30%"
+        },
+        "prerequisites": {
+          "level_min": 20,
+          "constitution_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "吸星真气",
+            "化功大法"
+          ]
+        },
+        "known_by": ["令狐冲", "任我行"],
+        "novel_source": "笑傲江湖"
+      },
+      {
+        "id": "kunlun_miegu",
+        "name": "八荒六合唯我独尊功",
+        "category": "内功",
+        "tier": "SSS",
+        "description": "逍遥派绝学，威力惊人但需返老还童修炼",
+        "effects": {
+          "mp_max": "+70%",
+          "all_stats": "+15%",
+          "rejuvenation": "可返老还童",
+          "power_boost": "修炼期间实力大增"
+        },
+        "prerequisites": {
+          "level_min": 45,
+          "intelligence_min": 90,
+          "previous_arts": ["小无相功"]
+        },
+        "skill_tree": {
+          "branches": [
+            "八荒真气",
+            "唯我独尊"
+          ]
+        },
+        "known_by": ["童姥", "虚竹"],
+        "novel_source": "天龙八部"
+      },
+      {
+        "id": "kuirui_baodian",
+        "name": "葵花宝典",
+        "category": "内功",
+        "tier": "SSS",
+        "description": "绝世神功，但需自宫修炼，天下第一神功",
+        "effects": {
+          "attack": "+80%",
+          "agility": "+90%",
+          "critical_rate": "+60%",
+          "movement_speed": "+100%"
+        },
+        "prerequisites": {
+          "level_min": 40,
+          "agility_min": 85,
+          "requirement": "必须自宫",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "葵花真气",
+            "绣花针法"
+          ]
+        },
+        "known_by": ["东方不败", "林平之", "岳不群"],
+        "novel_source": "笑傲江湖"
+      },
+      {
+        "id": "yinv_xinjing",
+        "name": "玉女心经",
+        "category": "内功",
+        "tier": "A+",
+        "description": "古墓派内功心法，需两人合练，威力倍增",
+        "effects": {
+          "mp_regen": "+40%",
+          "dual_practice_bonus": "与杨过合练效果+100%",
+          "yin_yang_balance": "阴阳调和，内力纯净"
+        },
+        "prerequisites": {
+          "level_min": 15,
+          "intelligence_min": 60,
+          "partner_required": true,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "玉女真气",
+            "玉女双修"
+          ]
+        },
+        "known_by": ["小龙女", "杨过"],
+        "novel_source": "神雕侠侣"
+      },
+      {
+        "id": "yijin_jing",
+        "name": "易筋经",
+        "category": "内功",
+        "tier": "S",
+        "description": "少林寺至高内功，可化解异种真气，延年益寿",
+        "effects": {
+          "hp_max": "+40%",
+          "hp_regen": "+50%",
+          "purify": "可化解异种真气",
+          "longevity": "延年益寿"
+        },
+        "prerequisites": {
+          "level_min": 30,
+          "constitution_min": 75,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "易筋真气",
+            "易筋洗髓"
+          ]
+        },
+        "known_by": ["令狐冲", "少林高僧", "方证大师"],
+        "novel_source": "笑傲江湖"
+      }
+    ],
+    "external_arts": [
+      {
+        "id": "xianglong_shibazhang",
+        "name": "降龙十八掌",
+        "category": "外功",
+        "tier": "SS",
+        "description": "丐帮两大镇帮神功之一，刚猛无比，至阳至刚",
+        "effects": {
+          "physical_damage": "+60%",
+          "aoe_radius": "中等范围",
+          "dragon_power": "龙气加成",
+          "knockback": "击退敌人"
+        },
+        "prerequisites": {
+          "level_min": 25,
+          "strength_min": 75,
+          "constitution_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "亢龙有悔",
+            "飞龙在天",
+            "潜龙勿用",
+            "神龙摆尾",
+            "见龙在田",
+            "鸿渐于陆"
+          ]
+        },
+        "known_by": ["萧峰", "郭靖", "洪七公", "耶律齐"],
+        "novel_source": "射雕英雄传"
+      },
+      {
+        "id": "dugu_jiujian",
+        "name": "独孤九剑",
+        "category": "外功",
+        "tier": "SSS",
+        "description": "剑魔独孤求败所创，专攻敌人破绽，天下剑法之冠",
+        "effects": {
+          "penetration": "+100%",
+          "critical_rate": "+50%",
+          "sword_mastery": "剑法威力+80%",
+          "break_defense": "无视防御"
+        },
+        "prerequisites": {
+          "level_min": 30,
+          "agility_min": 80,
+          "intelligence_min": 75,
+          "weapon_type": "剑",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "破剑式",
+            "破刀式",
+            "破枪式",
+            "破鞭式",
+            "破索式",
+            "破掌式",
+            "破箭式",
+            "破气式",
+            "总诀式"
+          ]
+        },
+        "known_by": ["独孤求败", "风清扬", "令狐冲", "杨过"],
+        "novel_source": "神雕侠侣"
+      },
+      {
+        "id": "anran_xiaohun_zhang",
+        "name": "黯然销魂掌",
+        "category": "外功",
+        "tier": "S+",
+        "description": "杨过所创，威力与降龙十八掌相当，需心怀悲怆才能发挥威力",
+        "effects": {
+          "physical_damage": "+65%",
+          "emotion_based": "悲怆心境威力+100%",
+          "unpredictable": "招式难以预测"
+        },
+        "prerequisites": {
+          "level_min": 35,
+          "strength_min": 70,
+          "intelligence_min": 75,
+          "emotion_state": "悲伤",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "心惊肉跳",
+            "杞人忧天",
+            "无中生有",
+            "拖泥带水",
+            "庸人自扰"
+          ]
+        },
+        "known_by": ["杨过"],
+        "novel_source": "神雕侠侣"
+      },
+      {
+        "id": "liumai_shenjian",
+        "name": "六脉神剑",
+        "category": "外功",
+        "tier": "SS",
+        "description": "大理段氏绝学，以指力化作无形剑气，威力惊人",
+        "effects": {
+          "spell_damage": "+70%",
+          "range": "远程",
+          "pierce": "穿透效果",
+          "six_streams": "六脉剑气各有不同"
+        },
+        "prerequisites": {
+          "level_min": 30,
+          "intelligence_min": 80,
+          "constitution_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "少商剑",
+            "商阳剑",
+            "中冲剑",
+            "关冲剑",
+            "少冲剑",
+            "少泽剑"
+          ]
+        },
+        "known_by": ["段誉", "段正明", "枯荣大师"],
+        "novel_source": "天龙八部"
+      },
+      {
+        "id": "tianshan_shemeishou",
+        "name": "天山折梅手",
+        "category": "外功",
+        "tier": "S",
+        "description": "逍遥派绝学，可变换无数招式，擒拿掌法于一体",
+        "effects": {
+          "versatility": "招式多变",
+          "grapple": "擒拿效果",
+          "palm_power": "掌法威力+50%"
+        },
+        "prerequisites": {
+          "level_min": 25,
+          "agility_min": 75,
+          "intelligence_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "折梅手",
+            "擒拿式",
+            "掌法式"
+          ]
+        },
+        "known_by": ["虚竹", "童姥"],
+        "novel_source": "天龙八部"
+      },
+      {
+        "id": "tianshan_liuyang_zhang",
+        "name": "天山六阳掌",
+        "category": "外功",
+        "tier": "S",
+        "description": "逍遥派绝学，与天山折梅手相辅相成，威力巨大",
+        "effects": {
+          "palm_damage": "+55%",
+          "solar_energy": "阳刚之力",
+          "freeze_chance": "有几率冻结敌人"
+        },
+        "prerequisites": {
+          "level_min": 25,
+          "strength_min": 70,
+          "agility_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "六阳掌",
+            "阳刚掌劲"
+          ]
+        },
+        "known_by": ["虚竹", "童姥"],
+        "novel_source": "天龙八部"
+      },
+      {
+        "id": "dagou_bangfa",
+        "name": "打狗棒法",
+        "category": "外功",
+        "tier": "S+",
+        "description": "丐帮两大镇帮神功之一，精妙绝伦，以棒为主",
+        "effects": {
+          "agility": "+40%",
+          "staff_mastery": "棒法威力+60%",
+          "precision": "精妙准绳"
+        },
+        "prerequisites": {
+          "level_min": 20,
+          "agility_min": 80,
+          "intelligence_min": 70,
+          "weapon_type": "棒",
+          "faction": "丐帮",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "棒打双犬",
+            "斜打狗背",
+            "天下无狗"
+          ]
+        },
+        "known_by": ["黄蓉", "洪七公", "鲁有脚", "耶律齐"],
+        "novel_source": "射雕英雄传"
+      },
+      {
+        "id": "yinv_suxin_jianfa",
+        "name": "玉女素心剑法",
+        "category": "外功",
+        "tier": "S",
+        "description": "古墓派剑法，需与玉女心经配合，杨过小龙女合璧威力倍增",
+        "effects": {
+          "dual_damage": "合璧双修威力+100%",
+          "sword_mastery": "剑法威力+50%",
+          "elegant": "招式优雅"
+        },
+        "prerequisites": {
+          "level_min": 20,
+          "agility_min": 75,
+          "partner_required": true,
+          "internal_art": "玉女心经",
+          "weapon_type": "剑",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "玉女剑法",
+            "素心剑法",
+            "合璧剑法"
+          ]
+        },
+        "known_by": ["杨过", "小龙女"],
+        "novel_source": "神雕侠侣"
+      },
+      {
+        "id": "kongming_quan",
+        "name": "空明拳",
+        "category": "外功",
+        "tier": "A+",
+        "description": "郭靖所创，以道家阴阳之理为基础，刚柔并济",
+        "effects": {
+          "balance": "刚柔并济",
+          "defense": "+30%",
+          "counter_damage": "+40%"
+        },
+        "prerequisites": {
+          "level_min": 20,
+          "intelligence_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "空明拳劲",
+            "阴阳平衡"
+          ]
+        },
+        "known_by": ["郭靖", "周伯通"],
+        "novel_source": "神雕侠侣"
+      },
+      {
+        "id": "zhongyuan_duanding_zhang",
+        "name": "中盘毒掌",
+        "category": "外功",
+        "tier": "A",
+        "description": "西域白驼山武功，掌中含有剧毒",
+        "effects": {
+          "poison_damage": "剧毒伤害",
+          "dot": "持续伤害",
+          "slow": "减缓敌人速度"
+        },
+        "prerequisites": {
+          "level_min": 15,
+          "constitution_min": 60,
+          "faction": "白驼山",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "毒掌",
+            "毒功"
+          ]
+        },
+        "known_by": ["欧阳锋", "欧阳克"],
+        "novel_source": "射雕英雄传"
+      }
+    ],
+    "weapon_arts": [
+      {
+        "id": "taiji_jian",
+        "name": "太极剑",
+        "category": "兵器",
+        "tier": "S",
+        "description": "武当派剑法，以柔克刚，圆转如意",
+        "effects": {
+          "sword_mastery": "剑法威力+50%",
+          "defense": "+40%",
+          "flow": "圆转如意，无始无终"
+        },
+        "prerequisites": {
+          "level_min": 25,
+          "agility_min": 70,
+          "intelligence_min": 65,
+          "weapon_type": "剑",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "太极剑意",
+            "圆转如意"
+          ]
+        },
+        "known_by": ["张三丰", "武当七侠", "张无忌"],
+        "novel_source": "倚天屠龙记"
+      },
+      {
+        "id": "xuantie_jianfa",
+        "name": "玄铁剑法",
+        "category": "兵器",
+        "tier": "S+",
+        "description": "独孤求败四十岁后所用剑法，重剑无锋，大巧不工",
+        "effects": {
+          "sword_damage": "+70%",
+          "strength_bonus": "力量加成+50%",
+          "heavy_attack": "重剑伤害+100%"
+        },
+        "prerequisites": {
+          "level_min": 35,
+          "strength_min": 85,
+          "weapon_type": "重剑",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "重剑无锋",
+            "大巧不工"
+          ]
+        },
+        "known_by": ["杨过", "独孤求败"],
+        "novel_source": "神雕侠侣"
+      },
+      {
+        "id": "luoying_shenjian_zhang",
+        "name": "落英神剑掌",
+        "category": "兵器",
+        "tier": "A+",
+        "description": "桃花岛武功，掌法如落花，虚实难辨",
+        "effects": {
+          "palm_damage": "+45%",
+          "illusion": "虚实难辨",
+          "elegant": "招式优雅"
+        },
+        "prerequisites": {
+          "level_min": 20,
+          "agility_min": 75,
+          "faction": "桃花岛",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "落英掌",
+            "神剑掌"
+          ]
+        },
+        "known_by": ["黄蓉", "黄药师"],
+        "novel_source": "射雕英雄传"
+      },
+      {
+        "id": "qigang_bodao",
+        "name": "七伤拳",
+        "category": "兵器",
+        "tier": "A+",
+        "description": "崆峒派绝学，威力巨大但损及自身，一练七伤",
+        "effects": {
+          "punch_damage": "+60%",
+          "self_damage": "使用损失自身HP",
+          "seven_injuries": "损伤五脏六腑"
+        },
+        "prerequisites": {
+          "level_min": 25,
+          "strength_min": 75,
+          "faction": "崆峒派",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "一练七伤",
+            "七伤拳劲"
+          ]
+        },
+        "known_by": ["崆峒五老", "金毛狮王谢逊"],
+        "novel_source": "倚天屠龙记"
+      },
+      {
+        "id": "huajia_daofa",
+        "name": "胡家刀法",
+        "category": "兵器",
+        "tier": "S",
+        "description": "雪山飞狐中胡一刀的刀法，威震关外",
+        "effects": {
+          "blade_mastery": "刀法威力+55%",
+          "speed": "招式迅捷",
+          "power": "威力巨大"
+        },
+        "prerequisites": {
+          "level_min": 20,
+          "strength_min": 75,
+          "agility_min": 70,
+          "weapon_type": "刀",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "胡刀",
+            "刀法精髓"
+          ]
+        },
+        "known_by": ["胡一刀", "胡斐"],
+        "novel_source": "雪山飞狐"
+      },
+      {
+        "id": "fuxue_chuanyun_zhang",
+        "name": "飘雪穿云掌",
+        "category": "兵器",
+        "tier": "A",
+        "description": "峨眉派精华掌法，轻灵飘逸",
+        "effects": {
+          "palm_damage": "+40%",
+          "agility": "+30%",
+          "evasion": "+25%"
+        },
+        "prerequisites": {
+          "level_min": 15,
+          "agility_min": 70,
+          "faction": "峨眉派",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "飘雪掌",
+            "穿云掌"
+          ]
+        },
+        "known_by": ["峨眉派弟子", "灭绝师太"],
+        "novel_source": "倚天屠龙记"
+      }
+    ],
+    "lightness_arts": [
+      {
+        "id": "lingbo_weibu",
+        "name": "凌波微步",
+        "category": "轻功",
+        "tier": "SS",
+        "description": "根据易经八卦所创，步法精妙绝伦",
+        "effects": {
+          "movement_speed": "+80%",
+          "evasion": "+60%",
+          "energy_efficiency": "体力消耗-50%"
+        },
+        "prerequisites": {
+          "level_min": 15,
+          "agility_min": 80,
+          "intelligence_min": 70,
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "凌波步",
+            "八卦步法"
+          ]
+        },
+        "known_by": ["段誉", "苏星河"],
+        "novel_source": "天龙八部"
+      },
+      {
+        "id": "qinggong",
+        "name": "梯云纵",
+        "category": "轻功",
+        "tier": "A+",
+        "description": "武当派轻功绝学，可垂直攀登",
+        "effects": {
+          "jump_height": "+100%",
+          "climb_speed": "+80%",
+          "movement_speed": "+40%"
+        },
+        "prerequisites": {
+          "level_min": 15,
+          "agility_min": 70,
+          "faction": "武当派",
+          "previous_arts": []
+        },
+        "skill_tree": {
+          "branches": [
+            "梯云",
+            "纵身"
+          ]
+        },
+        "known_by": ["张三丰", "武当七侠"],
+        "novel_source": "倚天屠龙记"
+      }
+    ]
+  }
+}

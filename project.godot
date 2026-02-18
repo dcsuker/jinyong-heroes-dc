@@ -10,9 +10,15 @@ config_version=5
 
 [application]
 
-config/name="jyqxzdc"
+config/name="金庸群侠传dc版"
+config/main_scene="res://src/main.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+
+
+[autoload]
+
+GlobalQuestManager="*res://src/systems/quest/global_quest_manager.gd"
 
 [physics]
 
