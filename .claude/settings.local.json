@@ -13,7 +13,15 @@
       "Bash(gh pr list:*)",
       "WebSearch",
       "WebFetch(domain:www.kanunu8.com)",
-      "Bash(git checkout HEAD:*)"
+      "Bash(git checkout HEAD:*)",
+      "Bash(ls:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(npm install)",
+      "Bash(npm run build)",
+      "Bash(node -e:*)",
+      "Bash(perl -i -pe \"s/JIN_YU 佩/JINYU_PEI/g\":*)",
+      "Bash(printf:*)",
+      "Bash(ed -s:*)"
     ]
   }
 }
