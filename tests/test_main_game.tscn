@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://main_jyqxzdc"]
+[gd_scene load_steps=4 format=3 uid="uid://test_main_game"]
 
 [ext_resource path="res://src/main.gd" type="Script" id="1_main_game"]
 [ext_resource path="res://src/core/ecs/entity_manager.gd" type="Script" id="2_entity_manager"]
@@ -10,7 +10,7 @@
 [ext_resource path="res://src/ui/battle_ui.tscn" type="PackedScene" id="8_battle_ui"]
 [ext_resource path="res://src/ui/dialogue_ui.tscn" type="PackedScene" id="9_dialogue_ui"]
 
-[node name="Main" type="Node2D"]
+[node name="TestMain" type="Node2D"]
 script = ExtResource("1_main_game")
 
 [node name="EntityManager" type="Node" parent="."]
@@ -39,6 +39,16 @@ visible = false
 [node name="DialogueUI" type="SubViewportContainer" parent="UI" instance=ExtResource("9_dialogue_ui")]
 visible = false
 
+[node name="DebugLabel" type="Label" parent="UI"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 400.0
+offset_bottom = 200.0
+text = "测试场景 - 主游戏
+WASD: 移动
+空格：开始测试战斗
+ESC: 退出"
+
 [node name="World" type="Node2D" parent="."]
 
 [node name="Player" type="CharacterBody2D" parent="World" groups=["player"]]
@@ -48,6 +58,7 @@ position = Vector2(400, 300)
 scale = Vector2(2, 2)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/Player"]
+shape = RectangleShape2D.new()
 
 [node name="Camera2D" type="Camera2D" parent="World/Player"]
 position_smoothing_enabled = true
@@ -58,14 +69,4 @@ collision_layer = 0
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="World/Player/InteractionArea"]
-
-[node name="NPCs" type="Node2D" parent="World"]
-
-[node name="DebugInfo" type="Label" parent="UI"]
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 300.0
-offset_bottom = 150.0
-text = "金庸群侠传 DC 版
-WASD: 移动
-空格：互动/确认"
+shape = CircleShape2D.new()

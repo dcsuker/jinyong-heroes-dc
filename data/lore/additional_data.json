@@ -1,0 +1,108 @@
+{
+  "additional_characters": [
+    {
+      "name": "杨康",
+      "novel": "射雕英雄传",
+      "role": "反派主角",
+      "traits": ["聪明", "虚荣", "认贼作父"],
+      "background": "杨铁心之子，被金国六王爷完颜洪烈收养",
+      "masters": ["梅超风", "丘处机"],
+      "martial_arts": ["九阴白骨爪", "全真剑法"],
+      "affiliations": ["金国"]
+    },
+    {
+      "name": "穆念慈",
+      "novel": "射雕英雄传",
+      "role": "重要角色",
+      "traits": ["善良", "忠贞"],
+      "background": "穆易之女，爱慕杨康",
+      "martial_arts": ["杨家枪法"]
+    },
+    {
+      "name": "梅超风",
+      "novel": "射雕英雄传",
+      "role": "反派",
+      "traits": ["狠毒", "悲剧"],
+      "background": "黄药师弟子，偷走九阴真经下卷",
+      "martial_arts": ["九阴白骨爪", "白蟒鞭法"],
+      "affiliations": ["桃花岛 (叛出)"]
+    },
+    {
+      "name": "一灯大师",
+      "novel": "射雕英雄传",
+      "role": "五绝之一",
+      "title": "南帝",
+      "background": "大理国皇帝，后出家为僧",
+      "affiliations": ["天龙寺"],
+      "martial_arts": ["一阳指", "先天功"]
+    },
+    {
+      "name": "王重阳",
+      "novel": "射雕英雄传",
+      "role": "五绝之首",
+      "title": "中神通",
+      "background": "全真教创始人",
+      "affiliations": ["全真教"],
+      "martial_arts": ["先天功", "全真剑法"]
+    }
+  ],
+  "plot_events": [
+    {
+      "id": "event_001",
+      "title": "牛家村惨案",
+      "novel": "射雕英雄传",
+      "chapter": 1,
+      "description": "郭啸天和杨铁心被段天德陷害，郭啸天战死，杨铁心失踪",
+      "participants": ["郭啸天", "杨铁心", "段天德"],
+      "location": "牛家村",
+      "consequences": ["郭靖出生前父亲战死", "杨康被完颜洪烈收养"]
+    },
+    {
+      "id": "event_002",
+      "title": "华山论剑",
+      "novel": "射雕英雄传",
+      "chapter": "序幕",
+      "description": "五位绝顶高手争夺九阴真经",
+      "participants": ["王重阳", "黄药师", "欧阳锋", "洪七公", "段智兴"],
+      "location": "华山",
+      "consequences": ["王重阳获胜", "五绝名号确立"]
+    },
+    {
+      "id": "event_003",
+      "title": "郭靖黄蓉相遇",
+      "novel": "射雕英雄传",
+      "chapter": 12,
+      "description": "郭靖在张家口偶遇黄蓉",
+      "participants": ["郭靖", "黄蓉"],
+      "location": "张家口",
+      "consequences": ["两人结为好友", "郭靖获赠汗血宝马"]
+    }
+  ],
+  "quest_templates": [
+    {
+      "id": "quest_001",
+      "title": "寻找江南七怪",
+      "description": "郭靖需要找到失散的江南七怪，学习武功",
+      "objectives": [
+        {"type": "talk_to", "target": "柯镇恶", "location": "嘉兴"},
+        {"type": "talk_to", "target": "朱聪", "location": "嘉兴"},
+        {"type": "talk_to", "target": "韩宝驹", "location": "嘉兴"}
+      ],
+      "rewards": {"exp": 1000, "items": ["金创药 x5"]},
+      "prerequisites": []
+    },
+    {
+      "id": "quest_002",
+      "title": "拜师洪七公",
+      "description": "黄蓉设计让洪七公教郭靖降龙十八掌",
+      "objectives": [
+        {"type": "find", "target": "洪七公", "location": "未知"},
+        {"type": "cook_dish", "dish": "叫花鸡"},
+        {"type": "cook_dish", "dish": "二十四桥明月夜"},
+        {"type": "learn_skill", "skill": "降龙十八掌"}
+      ],
+      "rewards": {"exp": 5000, "martial_arts": ["降龙十八掌"]},
+      "prerequisites": ["quest_001"]
+    }
+  ]
+}
