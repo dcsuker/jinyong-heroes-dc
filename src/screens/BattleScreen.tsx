@@ -36,6 +36,15 @@ export default function BattleScreen() {
   const [showItems, setShowItems] = useState(false);
 
   const enemySourceId = useMemo(() => makeEnemyId(activeQuests), [activeQuests]);
+  const syncPlayerVitals = (hp: number, mp: number) => {
+    useGameStore.setState((s) => ({
+      player: {
+        ...s.player,
+        hp: Math.max(0, Math.min(s.player.hpMax, hp)),
+        mp: Math.max(0, Math.min(s.player.mpMax, mp)),
+      },
+    }));
+  };
 
   useEffect(() => {
     audioManager.playBGM('battle');
@@ -87,13 +96,22 @@ export default function BattleScreen() {
 
   const addLog = (text: string) => setLog((prev) => [...prev.slice(-30), text]);
 
-  const commitEnd = (result: 'victory' | 'defeat', killedEnemyId?: string) => {
+  const commitEnd = (
+    result: 'victory' | 'defeat',
+    killedEnemyId?: string,
+    hpOverride?: number,
+    mpOverride?: number
+  ) => {
     if (ended) return;
     setEnded(result);
+    const current = useGameStore.getState().player;
+    const hpToSync = hpOverride ?? current.hp;
+    const mpToSync = mpOverride ?? current.mp;
 
     if (result === 'victory') {
       const exp = 100;
       const gold = 50;
+      syncPlayerVitals(hpToSync, mpToSync);
       gainExp(exp);
       addGold(gold);
       modifyReputation('good', 2);
@@ -114,6 +132,7 @@ export default function BattleScreen() {
 
       addLog(`胜利，获得 ${exp} 经验与 ${gold} 银两`);
     } else {
+      syncPlayerVitals(Math.max(1, hpToSync), mpToSync);
       addLog('战败，返回城镇');
     }
   };
@@ -132,7 +151,7 @@ export default function BattleScreen() {
       player: { ...hero, currentHp: hp, isDefeated: hp <= 0 },
     };
 
-    if (hp <= 0) commitEnd('defeat');
+    if (hp <= 0) commitEnd('defeat', undefined, hp, hero.currentMp);
     return updated;
   };
 
@@ -166,7 +185,12 @@ export default function BattleScreen() {
       };
 
       if (enemyHp <= 0) {
-        commitEnd('victory', enemy.enemyId);
+        commitEnd(
+          'victory',
+          enemy.enemyId,
+          hero.currentHp,
+          Math.max(0, hero.currentMp - mpCost)
+        );
         setBusy(false);
         return next;
       }
@@ -189,7 +213,11 @@ export default function BattleScreen() {
 
     const item = ITEMS[medicine.id];
     if (!item) return;
-    useItem(medicine.id);
+    const consumed = useItem(medicine.id);
+    if (!consumed) {
+      addLog('道具使用失败');
+      return;
+    }
     setShowItems(false);
 
     setUnits((prev) => {
@@ -213,6 +241,9 @@ export default function BattleScreen() {
   const doEscape = () => {
     if (busy || ended) return;
     if (Math.random() < 0.5) {
+      if (units.player) {
+        syncPlayerVitals(units.player.currentHp, units.player.currentMp);
+      }
       addLog('成功逃跑');
       setTimeout(() => setScreen('town'), 300);
     } else {

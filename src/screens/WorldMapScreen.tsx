@@ -18,6 +18,7 @@ export default function WorldMapScreen() {
   const { currentLocation, visitedLocations, setLocation, setScreen, party, player, gold } = useGameStore();
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [showParty, setShowParty] = useState(false);
+  const [travelError, setTravelError] = useState<string | null>(null);
 
   const currentLoc = LOCATIONS[currentLocation];
 
@@ -27,8 +28,16 @@ export default function WorldMapScreen() {
   }, []);
 
   const handleTravel = (locId: string) => {
+    const isCurrent = locId === currentLocation;
+    const isConnected = !!currentLoc?.connected?.includes(locId);
+    if (!isCurrent && !isConnected) {
+      setTravelError('该地点与当前位置不连通，无法直接前往。');
+      return;
+    }
+
     audioManager.playSFX('travel');
     setLocation(locId);
+    setTravelError(null);
     setSelectedLocation(null);
     setScreen('town');
   };
@@ -195,7 +204,10 @@ export default function WorldMapScreen() {
               }}
             >
               <button
-                onClick={() => setSelectedLocation(loc)}
+                onClick={() => {
+                  setTravelError(null);
+                  setSelectedLocation(loc);
+                }}
                 className={`relative w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all duration-300 transform -translate-x-1/2 -translate-y-1/2
                   ${isCurrent
                     ? `${style.color} ${style.shadow} scale-125 z-30`
@@ -236,6 +248,9 @@ export default function WorldMapScreen() {
               </div>
             </div>
             <p className="text-parchment/80 mb-4">{selectedLocation.description}</p>
+            {travelError && (
+              <p className="text-red-400 text-sm mb-3">{travelError}</p>
+            )}
 
             {selectedLocation.connected && selectedLocation.connected.length > 0 && (
               <div className="mb-4">
@@ -265,7 +280,10 @@ export default function WorldMapScreen() {
                 前往
               </button>
               <button
-                onClick={() => setSelectedLocation(null)}
+                onClick={() => {
+                  setTravelError(null);
+                  setSelectedLocation(null);
+                }}
                 className="flex-1 px-4 py-2 border border-gold text-gold rounded
                            hover:bg-gold hover:text-ink-dark transition-colors"
               >

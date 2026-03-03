@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useGameStore } from './store/gameStore';
 import MainMenuScreen from './screens/MainMenuScreen';
 import WorldMapScreen from './screens/WorldMapScreen';
@@ -11,6 +12,13 @@ import QuestScreen from './screens/QuestScreen';
 
 function App() {
   const screen = useGameStore((s) => s.screen);
+  const tickPlayTime = useGameStore((s) => s.tickPlayTime);
+
+  useEffect(() => {
+    if (screen === 'mainmenu') return;
+    const timer = window.setInterval(() => tickPlayTime(1), 1000);
+    return () => window.clearInterval(timer);
+  }, [screen, tickPlayTime]);
 
   const renderScreen = () => {
     switch (screen) {

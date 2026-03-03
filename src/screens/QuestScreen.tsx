@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { QUESTS } from '../data/quests';
 import { CHARACTERS } from '../data/characters';
@@ -5,10 +6,29 @@ import { LOCATIONS } from '../data/locations';
 import { ITEMS } from '../data/items';
 
 export default function QuestScreen() {
-  const { activeQuests, completedQuests, setScreen, acceptQuest } = useGameStore();
+  const { activeQuests, completedQuests, setScreen, acceptQuest, currentLocation } = useGameStore();
+
+  const previousQuestById = useMemo(() => {
+    return Object.values(QUESTS).reduce<Record<string, string>>((acc, quest) => {
+      if (quest.nextQuest) {
+        acc[quest.nextQuest] = quest.id;
+      }
+      return acc;
+    }, {});
+  }, []);
+
+  const localNpcIds = new Set(LOCATIONS[currentLocation]?.npcs ?? []);
 
   const availableQuests = Object.values(QUESTS).filter(
-    q => !activeQuests[q.id] && !completedQuests.includes(q.id)
+    (q) => {
+      if (activeQuests[q.id] || completedQuests.includes(q.id)) return false;
+
+      const previousQuest = previousQuestById[q.id];
+      if (previousQuest && !completedQuests.includes(previousQuest)) return false;
+
+      if (q.giver !== 'system' && !localNpcIds.has(q.giver)) return false;
+      return true;
+    }
   );
 
   const handleAcceptQuest = (questId: string) => {
@@ -79,7 +99,7 @@ export default function QuestScreen() {
                     </div>
                     <div className="mt-3 pt-3 border-t border-gold/20 text-sm text-parchment/60">
                       奖励: {quest.reward.exp} 经验, {quest.reward.gold} 两
-                      {quest.reward.item && `, ${QUESTS[quest.reward.item]?.name || '物品'}`}
+                      {quest.reward.item && `, ${ITEMS[quest.reward.item]?.name || '物品'}`}
                     </div>
                   </div>
                 ))}

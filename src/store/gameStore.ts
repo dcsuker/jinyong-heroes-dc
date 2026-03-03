@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ITEMS } from '../data/items';
+import { QUESTS } from '../data/quests';
 import type { GameScreen, Quest } from '../types';
 
 interface PlayerState {
@@ -145,10 +146,32 @@ export const useGameStore = create<GameStore>()(
         set((s) => {
           const inv = [...s.inventory];
           const idx = inv.findIndex((i) => i.id === itemId);
-          if (idx >= 0)
-            inv[idx] = { ...inv[idx], count: inv[idx].count + count };
-          else inv.push({ id: itemId, count });
-          return { inventory: inv };
+          const nextCount = idx >= 0 ? inv[idx].count + count : count;
+          if (idx >= 0) {
+            inv[idx] = { ...inv[idx], count: nextCount };
+          } else {
+            inv.push({ id: itemId, count: nextCount });
+          }
+
+          const activeQuests = Object.fromEntries(
+            Object.entries(s.activeQuests).map(([questId, quest]) => {
+              const objectives = quest.objectives.map((obj) => {
+                if (
+                  (obj.type === 'collect' || obj.type === 'find') &&
+                  obj.target === itemId
+                ) {
+                  return {
+                    ...obj,
+                    progress: Math.min(obj.count ?? 1, nextCount),
+                  };
+                }
+                return obj;
+              });
+              return [questId, { ...quest, objectives }];
+            })
+          );
+
+          return { inventory: inv, activeQuests };
         }),
 
       removeItem: (itemId, count = 1) => {
@@ -168,12 +191,33 @@ export const useGameStore = create<GameStore>()(
       addGold: (amount) => set((s) => ({ gold: Math.max(0, s.gold + amount) })),
 
       setLocation: (locationId) =>
-        set((s) => ({
-          currentLocation: locationId,
-          visitedLocations: s.visitedLocations.includes(locationId)
-            ? s.visitedLocations
-            : [...s.visitedLocations, locationId],
-        })),
+        set((s) => {
+          const activeQuests = Object.fromEntries(
+            Object.entries(s.activeQuests).map(([questId, quest]) => {
+              const objectives = quest.objectives.map((obj) => {
+                if (
+                  (obj.type === 'visit' || obj.type === 'reach') &&
+                  obj.target === locationId
+                ) {
+                  return {
+                    ...obj,
+                    progress: obj.count ?? 1,
+                  };
+                }
+                return obj;
+              });
+              return [questId, { ...quest, objectives }];
+            })
+          );
+
+          return {
+            currentLocation: locationId,
+            visitedLocations: s.visitedLocations.includes(locationId)
+              ? s.visitedLocations
+              : [...s.visitedLocations, locationId],
+            activeQuests,
+          };
+        }),
 
       setFlag: (key, value) =>
         set((s) => ({ flags: { ...s.flags, [key]: value } })),
@@ -229,9 +273,41 @@ export const useGameStore = create<GameStore>()(
         })),
 
       acceptQuest: (quest) =>
-        set((s) => ({
-          activeQuests: { ...s.activeQuests, [quest.id]: quest },
-        })),
+        set((s) => {
+          const inventoryCountById = Object.fromEntries(
+            s.inventory.map((entry) => [entry.id, entry.count])
+          );
+          const patchedObjectives = quest.objectives.map((obj) => {
+            if (
+              (obj.type === 'visit' || obj.type === 'reach') &&
+              obj.target === s.currentLocation
+            ) {
+              return {
+                ...obj,
+                progress: obj.count ?? 1,
+              };
+            }
+
+            if (obj.type === 'collect' || obj.type === 'find') {
+              const ownedCount = inventoryCountById[obj.target ?? ''] ?? 0;
+              if (ownedCount > 0) {
+                return {
+                  ...obj,
+                  progress: Math.min(obj.count ?? 1, ownedCount),
+                };
+              }
+            }
+
+            return obj;
+          });
+
+          return {
+            activeQuests: {
+              ...s.activeQuests,
+              [quest.id]: { ...quest, objectives: patchedObjectives },
+            },
+          };
+        }),
 
       updateQuestProgress: (questId, objectiveIdx, progress) =>
         set((s) => {
@@ -252,10 +328,21 @@ export const useGameStore = create<GameStore>()(
 
       completeQuest: (questId) =>
         set((s) => {
+          const finishedQuest = s.activeQuests[questId];
           const { [questId]: _, ...rest } = s.activeQuests;
+          const completedQuests = [...s.completedQuests, questId];
+          const nextQuestId = finishedQuest?.nextQuest;
+          const shouldUnlockNextQuest =
+            !!nextQuestId &&
+            !!QUESTS[nextQuestId] &&
+            !rest[nextQuestId] &&
+            !completedQuests.includes(nextQuestId);
+
           return {
-            activeQuests: rest,
-            completedQuests: [...s.completedQuests, questId],
+            activeQuests: shouldUnlockNextQuest
+              ? { ...rest, [nextQuestId!]: QUESTS[nextQuestId!] }
+              : rest,
+            completedQuests,
           };
         }),
 
@@ -292,6 +379,11 @@ export const useGameStore = create<GameStore>()(
             }
           });
 
+          const totalHpMax = newHpMax + equippedStats.hpMax;
+          const totalMpMax = newMpMax + equippedStats.mpMax;
+          const hpLevelGain = Math.max(0, newHpMax - s.player.baseStats.hpMax);
+          const mpLevelGain = Math.max(0, newMpMax - s.player.baseStats.mpMax);
+
           return {
             player: {
               ...s.player,
@@ -303,10 +395,10 @@ export const useGameStore = create<GameStore>()(
                 hpMax: newHpMax,
                 mpMax: newMpMax,
               },
-              hpMax: newHpMax + equippedStats.hpMax,
-              mpMax: newMpMax + equippedStats.mpMax,
-              hp: newHpMax + equippedStats.hpMax,
-              mp: newMpMax + equippedStats.mpMax,
+              hpMax: totalHpMax,
+              mpMax: totalMpMax,
+              hp: Math.min(totalHpMax, s.player.hp + hpLevelGain),
+              mp: Math.min(totalMpMax, s.player.mp + mpLevelGain),
             },
           };
         }),
