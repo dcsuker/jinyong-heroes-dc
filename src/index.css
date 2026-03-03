@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Serif SC', serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: #f5f0e8;
+  background-color: #1a1408;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #1a1408;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0a04;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a08040;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c8a96e;
+}
+
+/* Animations */
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(200, 169, 110, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px rgba(200, 169, 110, 0);
+  }
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-float-up {
+  animation: float-up 1s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-in;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s infinite;
+}
+
+/* Utility classes */
+.text-shadow-gold {
+  text-shadow: 0 0 10px rgba(200, 169, 110, 0.5);
+}
+
+.text-shadow-ink {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.border-gold-glow {
+  box-shadow: 0 0 10px rgba(200, 169, 110, 0.3);
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-6 py-3 bg-ink-light border-2 border-gold text-gold rounded
+         hover:bg-gold hover:text-ink-dark transition-all duration-300
+         hover:shadow-lg hover:shadow-gold/30 active:scale-95;
+}
+
+.btn-danger {
+  @apply px-6 py-3 bg-crimson border-2 border-crimson-light text-parchment rounded
+         hover:bg-crimson-light transition-all duration-300
+         active:scale-95;
+}
+
+/* Card styles */
+.card {
+  @apply bg-ink-light border border-gold/30 rounded-lg p-4
+         hover:border-gold/60 transition-all duration-300;
+}
+
+/* Progress bar */
+.progress-bar {
+  @apply h-2 bg-ink-dark rounded-full overflow-hidden;
+}
+
+.progress-bar-fill {
+  @apply h-full transition-all duration-300;
+}
