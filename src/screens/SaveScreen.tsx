@@ -3,7 +3,7 @@ import { useGameStore } from '../store/gameStore';
 import { LOCATIONS } from '../data/locations';
 
 interface SaveGameSnapshot {
-  player: unknown;
+  player: Record<string, unknown>;
   party: string[];
   inventory: Array<{ id: string; count: number }>;
   gold: number;
@@ -27,6 +27,7 @@ interface SaveSlotData {
 
 const SAVE_KEY = 'jin-yong-saves';
 const MAX_SLOTS = 6;
+type PlayerState = ReturnType<typeof useGameStore.getState>['player'];
 
 const isString = (v: unknown): v is string => typeof v === 'string';
 const isNumber = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
@@ -43,7 +44,7 @@ function isStringList(v: unknown): v is string[] {
 function isSaveGameSnapshot(v: unknown): v is SaveGameSnapshot {
   if (!isObject(v)) return false;
   return (
-    'player' in v &&
+    isObject(v.player) &&
     isStringList(v.party) &&
     isInventoryList(v.inventory) &&
     isNumber(v.gold) &&
@@ -54,6 +55,71 @@ function isSaveGameSnapshot(v: unknown): v is SaveGameSnapshot {
     isNumber(v.playTime) &&
     isStringList(v.visitedLocations)
   );
+}
+
+function normalizePlayer(raw: Record<string, unknown>, fallback: PlayerState) {
+  const numberFields: Array<keyof typeof fallback> = [
+    'level', 'exp', 'expNext', 'hp', 'hpMax', 'mp', 'mpMax', 'atk', 'def', 'spd', 'wis', 'charm', 'fameGood', 'fameEvil',
+  ];
+  const normalized = { ...fallback };
+
+  if (isString(raw.name)) normalized.name = raw.name;
+  numberFields.forEach((field) => {
+    const value = raw[field as string];
+    if (isNumber(value)) {
+      (normalized as Record<string, unknown>)[field as string] = value;
+    }
+  });
+
+  if (Array.isArray(raw.skills) && raw.skills.every(isString)) {
+    normalized.skills = raw.skills;
+  }
+  if (
+    isObject(raw.equipped) &&
+    isString(raw.equipped.weapon) &&
+    isString(raw.equipped.armor) &&
+    isString(raw.equipped.accessory)
+  ) {
+    normalized.equipped = {
+      weapon: raw.equipped.weapon,
+      armor: raw.equipped.armor,
+      accessory: raw.equipped.accessory,
+    };
+  }
+  if (isObject(raw.charAffinities)) {
+    normalized.charAffinities = Object.fromEntries(
+      Object.entries(raw.charAffinities).filter(([, v]) => isNumber(v))
+    ) as Record<string, number>;
+  }
+  if (isObject(raw.sectAffinities)) {
+    normalized.sectAffinities = Object.fromEntries(
+      Object.entries(raw.sectAffinities).filter(([, v]) => isNumber(v))
+    ) as Record<string, number>;
+  }
+  if (
+    isObject(raw.baseStats) &&
+    isNumber(raw.baseStats.atk) &&
+    isNumber(raw.baseStats.def) &&
+    isNumber(raw.baseStats.spd) &&
+    isNumber(raw.baseStats.wis) &&
+    isNumber(raw.baseStats.charm) &&
+    isNumber(raw.baseStats.hpMax) &&
+    isNumber(raw.baseStats.mpMax)
+  ) {
+    normalized.baseStats = {
+      atk: raw.baseStats.atk,
+      def: raw.baseStats.def,
+      spd: raw.baseStats.spd,
+      wis: raw.baseStats.wis,
+      charm: raw.baseStats.charm,
+      hpMax: raw.baseStats.hpMax,
+      mpMax: raw.baseStats.mpMax,
+    };
+  }
+
+  normalized.hp = Math.max(0, Math.min(normalized.hpMax, normalized.hp));
+  normalized.mp = Math.max(0, Math.min(normalized.mpMax, normalized.mp));
+  return normalized;
 }
 
 function isSaveSlotData(v: unknown): v is SaveSlotData {
@@ -165,9 +231,11 @@ export default function SaveScreen() {
         setMessage('存档结构无效，无法读取');
         return;
       }
+      const fallbackPlayer = useGameStore.getState().player;
+      const safePlayer = normalizePlayer(parsed.player, fallbackPlayer);
 
       useGameStore.setState({
-        player: parsed.player as typeof player,
+        player: safePlayer,
         party: parsed.party,
         inventory: parsed.inventory,
         gold: parsed.gold,

@@ -275,6 +275,14 @@ export const useGameStore = create<GameStore>()(
 
       acceptQuest: (quest) =>
         set((s) => {
+          if (s.activeQuests[quest.id] || s.completedQuests.includes(quest.id)) {
+            return s;
+          }
+          const previousQuestId = Object.values(QUESTS).find((q) => q.nextQuest === quest.id)?.id;
+          if (previousQuestId && !s.completedQuests.includes(previousQuestId)) {
+            return s;
+          }
+
           const inventoryCountById = Object.fromEntries(
             s.inventory.map((entry) => [entry.id, entry.count])
           );
@@ -331,7 +339,9 @@ export const useGameStore = create<GameStore>()(
         set((s) => {
           const finishedQuest = s.activeQuests[questId];
           const { [questId]: _, ...rest } = s.activeQuests;
-          const completedQuests = [...s.completedQuests, questId];
+          const completedQuests = s.completedQuests.includes(questId)
+            ? s.completedQuests
+            : [...s.completedQuests, questId];
           const nextQuestId = finishedQuest?.nextQuest;
           const shouldUnlockNextQuest =
             !!nextQuestId &&

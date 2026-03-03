@@ -38,6 +38,18 @@ export default function MainMenuScreen() {
     setMessage('');
     setScreen('worldmap');
   };
+  const handleExit = () => {
+    try {
+      window.close();
+      window.setTimeout(() => {
+        if (!document.hidden) {
+          setMessage('当前环境不允许关闭窗口，请使用浏览器标签页关闭按钮。');
+        }
+      }, 150);
+    } catch {
+      setMessage('当前环境不允许关闭窗口，请手动关闭页面。');
+    }
+  };
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-ink via-ink-light to-ink relative overflow-hidden">
@@ -95,7 +107,7 @@ export default function MainMenuScreen() {
           角色
         </button>
         <button
-          onClick={() => window.close()}
+          onClick={handleExit}
           className="px-8 py-4 bg-ink-dark border-2 border-gold/60 text-gold/80 text-lg font-bold
                      hover:border-crimson hover:text-crimson transition-all duration-300
                      active:scale-95"

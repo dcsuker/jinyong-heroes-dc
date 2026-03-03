@@ -1,4 +1,4 @@
-import type { Quest } from '../types';
+﻿import type { Quest } from '../types';
 
 export const QUESTS: Record<string, Quest> = {
   // 主线任务
@@ -14,11 +14,11 @@ export const QUESTS: Record<string, Quest> = {
     ],
     reward: { exp: 50, gold: 100 },
     nextQuest: 'main_02_shaolin_visit',
-    description: '初入江湖，先到嘉兴打探消息',
+    description: '初入江湖，先在嘉兴打听武林消息。',
   },
   main_02_shaolin_visit: {
     id: 'main_02_shaolin_visit',
-    name: '少林寺之会',
+    name: '少林寺之约',
     type: 'main',
     chapter: 1,
     giver: 'fang_zheng',
@@ -28,11 +28,11 @@ export const QUESTS: Record<string, Quest> = {
     ],
     reward: { exp: 100, gold: 200, affinity: { fang_zheng: 10 } },
     nextQuest: 'main_03_xiangyang_defense',
-    description: '前往少林寺，了解武林大会的消息',
+    description: '前往少林寺，与方证大师会面。',
   },
   main_03_xiangyang_defense: {
     id: 'main_03_xiangyang_defense',
-    name: '襄阳守卫战',
+    name: '襄阳守城',
     type: 'main',
     chapter: 2,
     giver: 'guo_jing',
@@ -43,11 +43,11 @@ export const QUESTS: Record<string, Quest> = {
     ],
     reward: { exp: 300, gold: 500, item: 'da_huan_dan', affinity: { guo_jing: 20 } },
     nextQuest: 'main_04_wudang_training',
-    description: '协助郭靖守卫襄阳城',
+    description: '协助郭靖守卫襄阳，击退来犯之敌。',
   },
   main_04_wudang_training: {
     id: 'main_04_wudang_training',
-    name: '武当学艺',
+    name: '武当问道',
     type: 'main',
     chapter: 2,
     giver: 'zhang_sanfeng',
@@ -58,11 +58,11 @@ export const QUESTS: Record<string, Quest> = {
     ],
     reward: { exp: 400, gold: 300, skill: 'tai_ji_quan', affinity: { zhang_sanfeng: 15 } },
     nextQuest: 'main_05_ming_cult',
-    description: '前往武当山学习太极拳',
+    description: '上武当拜见张三丰，领悟太极要义。',
   },
   main_05_ming_cult: {
     id: 'main_05_ming_cult',
-    name: '光明顶之战',
+    name: '光明顶会战',
     type: 'main',
     chapter: 3,
     giver: 'zhang_wuji',
@@ -73,11 +73,11 @@ export const QUESTS: Record<string, Quest> = {
     ],
     reward: { exp: 500, gold: 600, item: 'jiu_yang_miao_jing', affinity: { zhang_wuji: 20 } },
     nextQuest: 'main_06_black_cliff',
-    description: '协助明教抵御六大门派围攻',
+    description: '奔赴光明顶，助明教力挽狂澜。',
   },
   main_06_black_cliff: {
     id: 'main_06_black_cliff',
-    name: '决战黑木崖',
+    name: '黑木崖决战',
     type: 'main',
     chapter: 4,
     giver: 'ling_hu_chong',
@@ -87,7 +87,7 @@ export const QUESTS: Record<string, Quest> = {
     ],
     reward: { exp: 1000, gold: 2000, item: 'kui_hua_bao_dian', affinity: { ling_hu_chong: 30 } },
     nextQuest: 'main_07_final_battle',
-    description: '挑战东方不败，终结日月神教之乱',
+    description: '踏上黑木崖，与东方不败一决高下。',
   },
   main_07_final_battle: {
     id: 'main_07_final_battle',
@@ -100,7 +100,7 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'battle', target: 'final_boss', count: 1, progress: 0 },
     ],
     reward: { exp: 2000, gold: 5000, item: 'wu_xia_ling' },
-    description: '华山之巅，决出武林至尊',
+    description: '华山之巅，决出真正的武林至尊。',
   },
 
   // 支线任务
@@ -115,7 +115,7 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'talk', target: 'xiao_long_nv', progress: 0 },
     ],
     reward: { exp: 400, gold: 400, affinity: { yang_guo: 25, xiao_long_nv: 30 } },
-    description: '协助杨过救回小龙女',
+    description: '协助杨过救出小龙女。',
   },
   side_duanyu_journey: {
     id: 'side_duanyu_journey',
@@ -128,11 +128,11 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'battle', target: 'mu_rong_fu', count: 1, progress: 0 },
     ],
     reward: { exp: 350, gold: 500, skill: 'liu_mai_shen_jian', affinity: { duan_yu: 20 } },
-    description: '帮助段誉返回大理，解决家族纷争',
+    description: '随段誉返大理，化解家族风波。',
   },
   side_find_yijinjing: {
     id: 'side_find_yijinjing',
-    name: '寻找易筋经',
+    name: '寻回易筋经',
     type: 'side',
     giver: 'fang_zheng',
     objectives: [
@@ -141,7 +141,7 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'return', target: 'fang_zheng', progress: 0 },
     ],
     reward: { exp: 300, gold: 300, item: 'yi_jin_jing_book', affinity: { fang_zheng: 20 } },
-    description: '少林寺的易筋经被盗，请协助寻回',
+    description: '少林重宝失窃，请你追查并寻回。',
   },
   side_peach_island: {
     id: 'side_peach_island',
@@ -154,11 +154,11 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'talk', target: 'huang_yaoshi', progress: 0 },
     ],
     reward: { exp: 250, gold: 200, skill: 'tan_zhi_shen_tong', affinity: { huang_yaoshi: 15 } },
-    description: '通过桃花岛的机关阵，向东邪求学',
+    description: '通过桃花迷阵，向黄药师求教。',
   },
   side_beggar_hero: {
     id: 'side_beggar_hero',
-    name: '丐帮英雄',
+    name: '丐帮侠义',
     type: 'side',
     giver: 'hong_qi_gong',
     objectives: [
@@ -167,11 +167,11 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'talk', target: 'hong_qi_gong', progress: 0 },
     ],
     reward: { exp: 400, gold: 300, skill: 'da_gou_bang_fa', affinity: { hong_qi_gong: 25 } },
-    description: '协助丐帮清理江湖败类',
+    description: '协助丐帮清剿江湖恶霸。',
   },
   side_wei_xiaobao_mission: {
     id: 'side_wei_xiaobao_mission',
-    name: '鹿鼎记',
+    name: '鹿鼎密令',
     type: 'side',
     giver: 'wei_xiaobao',
     objectives: [
@@ -180,7 +180,7 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'find', target: 'si_shu_jian_pu', progress: 0 },
     ],
     reward: { exp: 300, gold: 1000, item: 'jin_chuang_yao', affinity: { wei_xiaobao: 20 } },
-    description: '帮韦小宝寻找四十二章经',
+    description: '帮韦小宝寻找遗失秘籍。',
   },
   side_yuan_chengzhi_challenge: {
     id: 'side_yuan_chengzhi_challenge',
@@ -193,7 +193,7 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'talk', target: 'yuan_chengzhi', progress: 0 },
     ],
     reward: { exp: 350, gold: 400, skill: 'jin_she_jian_fa', affinity: { yuan_chengzhi: 20 } },
-    description: '协助袁承志抗击清军',
+    description: '助袁承志抗清，守住山河义气。',
   },
   side_emei_sword: {
     id: 'side_emei_sword',
@@ -206,7 +206,7 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'talk', target: 'zhou_ziruo', progress: 0 },
     ],
     reward: { exp: 300, gold: 500, item: 'yi_tian_jian', affinity: { zhou_ziruo: 15 } },
-    description: '协助周芷若寻找倚天剑',
+    description: '协助周芷若寻得倚天剑。',
   },
   side_linghuchong_wine: {
     id: 'side_linghuchong_wine',
@@ -219,6 +219,6 @@ export const QUESTS: Record<string, Quest> = {
       { type: 'talk', target: 'ling_hu_chong', progress: 0 },
     ],
     reward: { exp: 200, gold: 200, skill: 'du_gu_jiu_jian', affinity: { ling_hu_chong: 15 } },
-    description: '给令狐冲找几瓶好酒，他就教你独孤九剑',
+    description: '替令狐冲备好美酒，换他传授剑意。',
   },
 };
