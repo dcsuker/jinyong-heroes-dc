@@ -75,6 +75,10 @@ export const CHARACTERS: Record<string, Character> = {
   kangxi: C('kangxi', '康熙', '鹿鼎记', 'qing', '👑', S(80, 60, 35, 45, 45, 80, 85)),
   duan_zhengchun: C('duan_zhengchun', '段正淳', '天龙八部', 'dali', '👑', S(90, 85, 72, 68, 62, 70, 88)),
   zuo_lengchan: C('zuo_lengchan', '左冷禅', '笑傲江湖', 'songshan', '🧊', S(98, 95, 88, 80, 60, 78, 62)),
+  jiaxing_storyteller: C('jiaxing_storyteller', '说书人', '江南杂记', 'none', '📖', S(62, 48, 24, 20, 42, 75, 70)),
+  jiaxing_constable: C('jiaxing_constable', '巡街捕快', '江南杂记', 'none', '🛡️', S(78, 55, 46, 42, 52, 40, 38)),
+  jiaxing_boatman: C('jiaxing_boatman', '南湖船夫', '江南杂记', 'none', '🛶', S(68, 52, 34, 28, 58, 45, 55)),
+  jiaxing_doctor: C('jiaxing_doctor', '月河郎中', '江南杂记', 'none', '💊', S(64, 70, 22, 26, 44, 82, 60)),
 
   mongol_soldier: C('mongol_soldier', '蒙古士兵', '通用', 'none', '🪖', S(60, 20, 28, 18, 35, 20, 15)),
   six_faction_elite: C('six_faction_elite', '六派高手', '通用', 'none', '⚔️', S(85, 45, 52, 38, 55, 40, 30)),

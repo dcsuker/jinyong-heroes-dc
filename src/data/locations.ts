@@ -23,7 +23,14 @@ const L = (
 });
 
 export const LOCATIONS: Record<string, Location> = {
-  jiaxing: L('jiaxing', '嘉兴', { x: 810, y: 370 }, ['hangzhou', 'lin_an', 'yangzhou'], ['innkeeper', 'merchant'], 'city', {
+  jiaxing: L(
+    'jiaxing',
+    '嘉兴',
+    { x: 810, y: 370 },
+    ['hangzhou', 'lin_an', 'yangzhou'],
+    ['innkeeper', 'merchant', 'jiaxing_storyteller', 'jiaxing_constable', 'jiaxing_boatman', 'jiaxing_doctor'],
+    'city',
+    {
     bgm: 'town_jiangnan',
     shopType: 'general',
     description: '江南起点，水路与商旅交汇之地',

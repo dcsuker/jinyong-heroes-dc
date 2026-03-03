@@ -104,6 +104,58 @@ export const QUESTS: Record<string, Quest> = {
   },
 
   // 支线任务
+  side_jiaxing_market_dispute: {
+    id: 'side_jiaxing_market_dispute',
+    name: '月河市井风波',
+    type: 'side',
+    giver: 'jiaxing_constable',
+    objectives: [
+      { type: 'talk', target: 'merchant', progress: 0 },
+      { type: 'talk', target: 'innkeeper', progress: 0 },
+      { type: 'return', target: 'jiaxing_constable', progress: 0 },
+    ],
+    reward: { exp: 120, gold: 180, affinity: { jiaxing_constable: 10 } },
+    description: '协助巡街捕快厘清月河商街纠纷。'
+  },
+  side_jiaxing_nanhu_patrol: {
+    id: 'side_jiaxing_nanhu_patrol',
+    name: '南湖夜渡',
+    type: 'side',
+    giver: 'jiaxing_boatman',
+    objectives: [
+      { type: 'visit', target: 'jiaxing', progress: 0 },
+      { type: 'battle', target: 'evil_bandit', count: 2, progress: 0 },
+      { type: 'return', target: 'jiaxing_boatman', progress: 0 },
+    ],
+    reward: { exp: 180, gold: 260, item: 'jin_chuang_yao', affinity: { jiaxing_boatman: 12 } },
+    description: '护送夜航船只，击退趁夜作乱的水寇。'
+  },
+  side_jiaxing_old_pact: {
+    id: 'side_jiaxing_old_pact',
+    name: '醉仙楼旧约',
+    type: 'side',
+    giver: 'jiaxing_storyteller',
+    objectives: [
+      { type: 'talk', target: 'jiaxing_storyteller', progress: 0 },
+      { type: 'talk', target: 'jiaxing_boatman', progress: 0 },
+      { type: 'return', target: 'jiaxing_storyteller', progress: 0 },
+    ],
+    reward: { exp: 140, gold: 220, affinity: { jiaxing_storyteller: 15 } },
+    description: '追寻醉仙楼旧闻，在南湖与旧人残忆中拼回往事。'
+  },
+  side_jiaxing_clinic_run: {
+    id: 'side_jiaxing_clinic_run',
+    name: '药铺急诊',
+    type: 'side',
+    giver: 'jiaxing_doctor',
+    objectives: [
+      { type: 'talk', target: 'jiaxing_doctor', progress: 0 },
+      { type: 'talk', target: 'innkeeper', progress: 0 },
+      { type: 'return', target: 'jiaxing_doctor', progress: 0 },
+    ],
+    reward: { exp: 110, gold: 150, item: 'xiao_huan_dan', affinity: { jiaxing_doctor: 12 } },
+    description: '替月河郎中奔走送药，稳定码头疫病隐患。'
+  },
   side_rescue_xiaolongnv: {
     id: 'side_rescue_xiaolongnv',
     name: '古墓救美',
