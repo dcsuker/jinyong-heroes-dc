@@ -9,16 +9,49 @@ export default function DialogueScreen() {
     setScreen,
     modifyAffinity,
     addPartyMember,
+    completedQuests,
+    party,
     player,
   } = useGameStore();
 
   const [done, setDone] = useState(false);
+  const [message, setMessage] = useState('');
 
   const char = currentDialogue ? CHARACTERS[currentDialogue] : null;
   const affinity = useMemo(() => {
     if (!currentDialogue) return 0;
     return player.charAffinities[currentDialogue] ?? 0;
   }, [currentDialogue, player.charAffinities]);
+
+  const recruitCheck = useMemo(() => {
+    if (!char || !char.recruitable) {
+      return { canRecruit: false, reason: '该角色不可招募' };
+    }
+    if (party.includes(char.id)) {
+      return { canRecruit: false, reason: '该角色已在队伍中' };
+    }
+    if (party.length >= 4) {
+      return { canRecruit: false, reason: '队伍人数已满（最多 4 人）' };
+    }
+
+    const cond = char.recruitCondition;
+    if (!cond) return { canRecruit: true, reason: '' };
+
+    if (typeof cond.fameGood === 'number' && player.fameGood < cond.fameGood) {
+      return { canRecruit: false, reason: `正派声望需达到 ${cond.fameGood}` };
+    }
+    if (typeof cond.fameEvil === 'number' && player.fameEvil < cond.fameEvil) {
+      return { canRecruit: false, reason: `邪派声望需达到 ${cond.fameEvil}` };
+    }
+    if (typeof cond.affinity === 'number' && affinity < cond.affinity) {
+      return { canRecruit: false, reason: `好感度需达到 ${cond.affinity}` };
+    }
+    if (cond.quest && !completedQuests.includes(cond.quest)) {
+      return { canRecruit: false, reason: `需先完成任务：${cond.quest}` };
+    }
+
+    return { canRecruit: true, reason: '' };
+  }, [affinity, char, completedQuests, party, player.fameEvil, player.fameGood]);
 
   if (!char) {
     return (
@@ -41,11 +74,18 @@ export default function DialogueScreen() {
   const handleFriendly = () => {
     modifyAffinity(char.id, 5);
     setDone(true);
+    setMessage('');
   };
 
   const handleRecruit = () => {
+    if (!recruitCheck.canRecruit) {
+      setMessage(recruitCheck.reason);
+      return;
+    }
+
     const ok = addPartyMember(char.id);
     setDone(ok);
+    setMessage(ok ? `${char.name} 已加入队伍` : '入队失败');
   };
 
   const handleBattle = () => {
@@ -62,13 +102,23 @@ export default function DialogueScreen() {
           <p className="text-parchment mb-6">
             {done ? `${char.name} 对你的态度有所变化。` : `${char.description}`}
           </p>
+          {message && <p className="text-amber-300 mb-4">{message}</p>}
 
           <div className="flex flex-wrap gap-3">
             <button onClick={handleFriendly} className="px-4 py-2 bg-crimson text-parchment rounded">
               寒暄
             </button>
             {char.recruitable && (
-              <button onClick={handleRecruit} className="px-4 py-2 bg-green-700 text-parchment rounded">
+              <button
+                onClick={handleRecruit}
+                disabled={!recruitCheck.canRecruit}
+                className={`px-4 py-2 rounded ${
+                  recruitCheck.canRecruit
+                    ? 'bg-green-700 text-parchment hover:bg-green-600'
+                    : 'bg-stone-700 text-stone-300 cursor-not-allowed'
+                }`}
+                title={recruitCheck.canRecruit ? '' : recruitCheck.reason}
+              >
                 邀请入队
               </button>
             )}

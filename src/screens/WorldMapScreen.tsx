@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { LOCATIONS } from '../data/locations';
 import { audioManager } from '../utils/audioManager';
@@ -21,6 +21,24 @@ export default function WorldMapScreen() {
   const [travelError, setTravelError] = useState<string | null>(null);
 
   const currentLoc = LOCATIONS[currentLocation];
+  const locationLinks = useMemo(() => {
+    const links: Array<{ key: string; from: Location; to: Location; isReachable: boolean }> = [];
+    const seen = new Set<string>();
+
+    Object.values(LOCATIONS).forEach((from) => {
+      (from.connected ?? []).forEach((toId) => {
+        const to = LOCATIONS[toId];
+        if (!to) return;
+        const key = [from.id, to.id].sort().join('__');
+        if (seen.has(key)) return;
+        seen.add(key);
+        const isReachable = from.id === currentLocation || to.id === currentLocation;
+        links.push({ key, from, to, isReachable });
+      });
+    });
+
+    return links;
+  }, [currentLocation]);
 
   // 播放世界地图BGM
   useEffect(() => {
@@ -186,6 +204,21 @@ export default function WorldMapScreen() {
 
       {/* 地点节点 */}
       <div className="absolute inset-0">
+        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+          {locationLinks.map((link) => (
+            <line
+              key={link.key}
+              x1={`${link.from.mapPos.x / 10}%`}
+              y1={`${link.from.mapPos.y / 6}%`}
+              x2={`${link.to.mapPos.x / 10}%`}
+              y2={`${link.to.mapPos.y / 6}%`}
+              stroke={link.isReachable ? '#f59e0b' : '#78716c'}
+              strokeWidth={link.isReachable ? 2.2 : 1.2}
+              strokeOpacity={link.isReachable ? 0.75 : 0.35}
+              strokeDasharray={link.isReachable ? '0' : '4 4'}
+            />
+          ))}
+        </svg>
         {Object.values(LOCATIONS).map((loc) => {
           const isCurrent = loc.id === currentLocation;
           const isVisited = visitedLocations.includes(loc.id);

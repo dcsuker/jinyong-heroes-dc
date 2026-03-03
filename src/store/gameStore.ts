@@ -73,6 +73,7 @@ interface GameStore {
   equipItem: (itemId: string, slot: 'weapon' | 'armor' | 'accessory') => void;
   unequipItem: (slot: 'weapon' | 'armor' | 'accessory') => void;
   useItem: (itemId: string) => boolean;
+  consumeItem: (itemId: string) => { ok: boolean; message: string; hpGain: number; mpGain: number };
   recalculateStats: () => void;
   // 对话系统
   currentDialogue: string | null;
@@ -554,6 +555,62 @@ export const useGameStore = create<GameStore>()(
         });
 
         return true;
+      },
+
+      consumeItem: (itemId) => {
+        const state = get();
+        const itemEntry = state.inventory.find((i) => i.id === itemId);
+        if (!itemEntry || itemEntry.count <= 0) {
+          return { ok: false, message: '道具数量不足', hpGain: 0, mpGain: 0 };
+        }
+
+        const item = ITEMS[itemId];
+        if (!item) {
+          return { ok: false, message: '道具不存在', hpGain: 0, mpGain: 0 };
+        }
+
+        if (item.type === 'manual') {
+          const skillId = typeof item.effect.skill === 'string' ? item.effect.skill : '';
+          if (!skillId) {
+            return { ok: false, message: '秘籍缺少技能配置', hpGain: 0, mpGain: 0 };
+          }
+          if (state.player.skills.includes(skillId)) {
+            return { ok: false, message: '已经学会此武功', hpGain: 0, mpGain: 0 };
+          }
+        }
+
+        let hpGain = 0;
+        let mpGain = 0;
+
+        set((s) => {
+          const newInventory = s.inventory
+            .map((i) => (i.id === itemId ? { ...i, count: i.count - 1 } : i))
+            .filter((i) => i.count > 0);
+
+          let nextPlayer = s.player;
+          if (item.type === 'medicine') {
+            const hpAdd = typeof item.effect.hp === 'number' ? item.effect.hp : 0;
+            const mpAdd = typeof item.effect.mp === 'number' ? item.effect.mp : 0;
+            const nextHp = Math.min(s.player.hpMax, s.player.hp + hpAdd);
+            const nextMp = Math.min(s.player.mpMax, s.player.mp + mpAdd);
+            hpGain = Math.max(0, nextHp - s.player.hp);
+            mpGain = Math.max(0, nextMp - s.player.mp);
+            nextPlayer = { ...s.player, hp: nextHp, mp: nextMp };
+          } else if (item.type === 'manual') {
+            const skillId = item.effect.skill as string;
+            nextPlayer = { ...s.player, skills: [...s.player.skills, skillId] };
+          }
+
+          return { inventory: newInventory, player: nextPlayer };
+        });
+
+        if (item.type === 'manual') {
+          return { ok: true, message: `学会了 ${item.name}`, hpGain: 0, mpGain: 0 };
+        }
+        if (item.type === 'medicine') {
+          return { ok: true, message: `使用了 ${item.name}`, hpGain, mpGain };
+        }
+        return { ok: true, message: `使用了 ${item.name}`, hpGain: 0, mpGain: 0 };
       },
     }),
     {

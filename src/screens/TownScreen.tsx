@@ -17,12 +17,22 @@ export default function TownScreen() {
   }, [currentLocation]);
 
   const npcIds = location?.npcs ?? [];
+  const previousQuestById = useMemo(() => {
+    return Object.values(QUESTS).reduce<Record<string, string>>((acc, quest) => {
+      if (quest.nextQuest) acc[quest.nextQuest] = quest.id;
+      return acc;
+    }, {});
+  }, []);
 
   const npcQuestState = useMemo(() => {
     const completed = useGameStore.getState().completedQuests;
     return npcIds.reduce<Record<string, { canGive: boolean; canComplete: boolean }>>((acc, npcId) => {
       const canGive = Object.values(QUESTS).some(
-        (q) => q.giver === npcId && !activeQuests[q.id] && !completed.includes(q.id)
+        (q) => {
+          if (q.giver !== npcId || activeQuests[q.id] || completed.includes(q.id)) return false;
+          const prev = previousQuestById[q.id];
+          return !prev || completed.includes(prev);
+        }
       );
       const canComplete = Object.values(activeQuests).some((quest) => {
         const targetIdx = quest.objectives.findIndex(
@@ -34,7 +44,7 @@ export default function TownScreen() {
       acc[npcId] = { canGive, canComplete };
       return acc;
     }, {});
-  }, [activeQuests, npcIds]);
+  }, [activeQuests, npcIds, previousQuestById]);
 
   const onTalk = (npcId: string) => {
     audioManager.playSFX('talk');
@@ -49,7 +59,11 @@ export default function TownScreen() {
     if (state.canGive) {
       const completed = useGameStore.getState().completedQuests;
       const quest = Object.values(QUESTS).find(
-        (q) => q.giver === npcId && !activeQuests[q.id] && !completed.includes(q.id)
+        (q) => {
+          if (q.giver !== npcId || activeQuests[q.id] || completed.includes(q.id)) return false;
+          const prev = previousQuestById[q.id];
+          return !prev || completed.includes(prev);
+        }
       );
       if (quest) {
         acceptQuest(quest);

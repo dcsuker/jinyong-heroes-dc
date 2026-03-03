@@ -20,7 +20,7 @@ export default function BattleScreen() {
     player,
     activeQuests,
     inventory,
-    useItem,
+    consumeItem,
     updateQuestProgress,
     gainExp,
     addGold,
@@ -213,9 +213,9 @@ export default function BattleScreen() {
 
     const item = ITEMS[medicine.id];
     if (!item) return;
-    const consumed = useItem(medicine.id);
-    if (!consumed) {
-      addLog('道具使用失败');
+    const result = consumeItem(medicine.id);
+    if (!result.ok) {
+      addLog(result.message);
       return;
     }
     setShowItems(false);
@@ -223,17 +223,15 @@ export default function BattleScreen() {
     setUnits((prev) => {
       const hero = prev.player;
       if (!hero) return prev;
-      const hpAdd = typeof item.effect.hp === 'number' ? item.effect.hp : 0;
-      const mpAdd = typeof item.effect.mp === 'number' ? item.effect.mp : 0;
       const next: UnitMap = {
         ...prev,
         player: {
           ...hero,
-          currentHp: Math.min(hero.stats.hpMax, hero.currentHp + hpAdd),
-          currentMp: Math.min(hero.stats.mpMax, hero.currentMp + mpAdd),
+          currentHp: Math.min(hero.stats.hpMax, hero.currentHp + result.hpGain),
+          currentMp: Math.min(hero.stats.mpMax, hero.currentMp + result.mpGain),
         },
       };
-      addLog(`使用 ${item.name}`);
+      addLog(result.message);
       return enemyTurn(next);
     });
   };
