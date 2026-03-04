@@ -14,6 +14,13 @@ interface MapSpot {
   kind: 'poi' | 'npc';
 }
 
+interface CollisionRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 const JIAXING_SPOTS: MapSpot[] = [
   { id: 'inn', label: '悦来客栈', x: 24, y: 58, npcId: 'innkeeper', kind: 'npc' },
   { id: 'market', label: '河街集市', x: 60, y: 44, npcId: 'merchant', kind: 'npc' },
@@ -26,7 +33,21 @@ const JIAXING_SPOTS: MapSpot[] = [
   { id: 'little_penglai', label: '小蓬莱石坊', x: 88, y: 50, kind: 'poi' },
 ];
 
+const JIAXING_COLLIDERS: CollisionRect[] = [
+  { x: 12, y: 30, w: 18, h: 32 }, // 客栈街区建筑群
+  { x: 46, y: 24, w: 18, h: 30 }, // 茶楼书棚建筑
+  { x: 70, y: 22, w: 20, h: 30 }, // 巡捕岗亭建筑
+  { x: 56, y: 74, w: 40, h: 18 }, // 南湖近岸水域
+  { x: 84, y: 44, w: 11, h: 15 }, // 小蓬莱石坊内侧
+];
+
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+
+const collidesWithRect = (x: number, y: number, rect: CollisionRect, radius: number) => {
+  const nearestX = clamp(x, rect.x, rect.x + rect.w);
+  const nearestY = clamp(y, rect.y, rect.y + rect.h);
+  return Math.hypot(x - nearestX, y - nearestY) < radius;
+};
 
 export default function TownScreen() {
   const {
@@ -202,6 +223,10 @@ export default function TownScreen() {
     let raf = 0;
     let last = performance.now();
     const speed = 24;
+    const playerRadius = 2.4;
+
+    const isBlocked = (x: number, y: number) =>
+      JIAXING_COLLIDERS.some((rect) => collidesWithRect(x, y, rect, playerRadius));
 
     const tick = (now: number) => {
       const dt = (now - last) / 1000;
@@ -218,10 +243,25 @@ export default function TownScreen() {
       if (dx !== 0 || dy !== 0) {
         const len = Math.hypot(dx, dy);
         const step = speed * dt;
-        setPlayerPos((prev) => ({
-          x: clamp(prev.x + (dx / len) * step, 6, 94),
-          y: clamp(prev.y + (dy / len) * step, 8, 92),
-        }));
+        const vx = (dx / len) * step;
+        const vy = (dy / len) * step;
+
+        setPlayerPos((prev) => {
+          const targetX = clamp(prev.x + vx, 6, 94);
+          const targetY = clamp(prev.y + vy, 8, 92);
+
+          const allowX = !isBlocked(targetX, prev.y);
+          const allowY = !isBlocked(prev.x, targetY);
+
+          const nextX = allowX ? targetX : prev.x;
+          const nextY = allowY ? targetY : prev.y;
+
+          if (!allowX && !allowY) {
+            return prev;
+          }
+
+          return { x: nextX, y: nextY };
+        });
       }
 
       raf = requestAnimationFrame(tick);
