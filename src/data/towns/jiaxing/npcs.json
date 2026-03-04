@@ -1,0 +1,38 @@
+[
+  {
+    "id": "innkeeper",
+    "label": "店小二",
+    "x": 7,
+    "y": 9
+  },
+  {
+    "id": "merchant",
+    "label": "商人",
+    "x": 13,
+    "y": 11
+  },
+  {
+    "id": "jiaxing_storyteller",
+    "label": "说书人",
+    "x": 10,
+    "y": 6
+  },
+  {
+    "id": "jiaxing_constable",
+    "label": "巡街捕快",
+    "x": 18,
+    "y": 6
+  },
+  {
+    "id": "jiaxing_boatman",
+    "label": "南湖船夫",
+    "x": 22,
+    "y": 12
+  },
+  {
+    "id": "jiaxing_doctor",
+    "label": "月河郎中",
+    "x": 5,
+    "y": 11
+  }
+]

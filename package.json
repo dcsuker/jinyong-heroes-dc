@@ -11,7 +11,9 @@
     "validate:data": "node scripts/validate-data.mjs"
   },
   "dependencies": {
+    "@pixi/tilemap": "^5.0.2",
     "howler": "^2.2.4",
+    "pixi.js": "^8.16.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^6.30.3",

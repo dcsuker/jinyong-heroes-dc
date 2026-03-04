@@ -1,6 +1,7 @@
-﻿import { useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { CHARACTERS } from '../data/characters';
+import { DIALOGUES } from '../data/dialogues';
 
 export default function DialogueScreen() {
   const {
@@ -16,12 +17,32 @@ export default function DialogueScreen() {
 
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState('');
+  const [lineIdx, setLineIdx] = useState(0);
+  const [ended, setEnded] = useState(false);
 
   const char = currentDialogue ? CHARACTERS[currentDialogue] : null;
   const affinity = useMemo(() => {
     if (!currentDialogue) return 0;
     return player.charAffinities[currentDialogue] ?? 0;
   }, [currentDialogue, player.charAffinities]);
+
+  const lines = useMemo(() => {
+    if (!char) return [];
+    return DIALOGUES[char.id] ?? [char.description || `${char.name} 看着你，等你开口。`];
+  }, [char]);
+
+  useEffect(() => {
+    setDone(false);
+    setMessage('');
+    setLineIdx(0);
+    setEnded(false);
+  }, [currentDialogue]);
+
+  useEffect(() => {
+    if (!currentDialogue) return;
+    if (char) return;
+    useGameStore.setState({ currentDialogue: null, screen: 'town' });
+  }, [char, currentDialogue]);
 
   const recruitCheck = useMemo(() => {
     if (!char || !char.recruitable) {
@@ -56,12 +77,17 @@ export default function DialogueScreen() {
   if (!char) {
     return (
       <div className="w-full h-full bg-ink flex items-center justify-center">
-        <button
-          onClick={() => setScreen('town')}
-          className="px-4 py-2 border border-gold/50 text-gold rounded"
-        >
-          返回城镇
-        </button>
+        <div className="text-center space-y-4">
+          <p className="text-parchment/80 text-lg">对话目标异常，已回退到城镇。</p>
+          <button
+            onClick={() => {
+              useGameStore.setState({ currentDialogue: null, screen: 'town' });
+            }}
+            className="px-4 py-2 border border-gold/50 text-gold rounded"
+          >
+            返回城镇
+          </button>
+        </div>
       </div>
     );
   }
@@ -73,8 +99,14 @@ export default function DialogueScreen() {
 
   const handleFriendly = () => {
     modifyAffinity(char.id, 5);
-    setDone(true);
+    setDone(false);
     setMessage('');
+    if (lineIdx < Math.max(lines.length - 1, 0)) {
+      setLineIdx((idx) => idx + 1);
+    } else {
+      setEnded(true);
+      setMessage('这段对话已结束。');
+    }
   };
 
   const handleRecruit = () => {
@@ -93,26 +125,48 @@ export default function DialogueScreen() {
     setScreen('battle');
   };
 
+  const handleNextLine = () => {
+    setDone(false);
+    setMessage('');
+    if (lineIdx < Math.max(lines.length - 1, 0)) {
+      setLineIdx((idx) => idx + 1);
+    } else {
+      setEnded(true);
+      setMessage('已到最后一句。');
+    }
+  };
+
   return (
     <div className="w-full h-full bg-ink flex flex-col">
       <div className="flex-1 p-8">
         <div className="max-w-3xl mx-auto bg-ink-dark border border-gold/30 rounded-lg p-6">
-          <h2 className="text-2xl text-gold font-bold mb-2">{char.name}</h2>
-          <p className="text-parchment/70 mb-4">好感度: {affinity}</p>
-          <p className="text-parchment mb-6">
-            {done ? `${char.name} 对你的态度有所变化。` : `${char.description}`}
+          <h2 className="text-3xl text-gold font-bold mb-2">{char.name}</h2>
+          <p className="text-parchment/70 mb-4 text-lg">好感度: {affinity}</p>
+          <p className="text-parchment mb-6 text-xl leading-9">
+            {done ? `${char.name} 对你的态度有所变化。` : lines[lineIdx] ?? char.description}
           </p>
-          {message && <p className="text-amber-300 mb-4">{message}</p>}
+          {message && <p className="text-amber-300 mb-4 text-lg">{message}</p>}
 
-          <div className="flex flex-wrap gap-3">
-            <button onClick={handleFriendly} className="px-4 py-2 bg-crimson text-parchment rounded">
+          <div className="flex flex-wrap gap-3 text-lg">
+            <button
+              onClick={handleNextLine}
+              disabled={ended}
+              className={`px-5 py-2.5 border rounded ${
+                ended
+                  ? 'border-sky-900/60 text-sky-800 cursor-not-allowed'
+                  : 'border-sky-500/60 text-sky-300'
+              }`}
+            >
+              {ended ? '已结束' : '下一句'}
+            </button>
+            <button onClick={handleFriendly} className="px-5 py-2.5 bg-crimson text-parchment rounded">
               寒暄
             </button>
             {char.recruitable && (
               <button
                 onClick={handleRecruit}
                 disabled={!recruitCheck.canRecruit}
-                className={`px-4 py-2 rounded ${
+                className={`px-5 py-2.5 rounded ${
                   recruitCheck.canRecruit
                     ? 'bg-green-700 text-parchment hover:bg-green-600'
                     : 'bg-stone-700 text-stone-300 cursor-not-allowed'
@@ -122,10 +176,10 @@ export default function DialogueScreen() {
                 邀请入队
               </button>
             )}
-            <button onClick={handleBattle} className="px-4 py-2 border border-red-500/60 text-red-300 rounded">
+            <button onClick={handleBattle} className="px-5 py-2.5 border border-red-500/60 text-red-300 rounded">
               切磋
             </button>
-            <button onClick={leave} className="px-4 py-2 border border-gold/50 text-gold rounded">
+            <button onClick={leave} className="px-5 py-2.5 border border-gold/50 text-gold rounded">
               离开
             </button>
           </div>

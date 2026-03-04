@@ -1,0 +1,44 @@
+[
+  {
+    "id": "yuelai_inn",
+    "label": "悦来客栈",
+    "x": 6,
+    "y": 9
+  },
+  {
+    "id": "tea_house",
+    "label": "茶楼书棚",
+    "x": 12,
+    "y": 6
+  },
+  {
+    "id": "yamen_post",
+    "label": "巡捕岗亭",
+    "x": 18,
+    "y": 5
+  },
+  {
+    "id": "nanhu_dock",
+    "label": "南湖船埠",
+    "x": 22,
+    "y": 11
+  },
+  {
+    "id": "iron_spear_temple",
+    "label": "铁枪庙旧址",
+    "x": 3,
+    "y": 14
+  },
+  {
+    "id": "little_penglai",
+    "label": "小蓬莱石坊",
+    "x": 25,
+    "y": 10
+  },
+  {
+    "id": "yanyu_tower",
+    "label": "烟雨楼远眺",
+    "x": 21,
+    "y": 13
+  }
+]

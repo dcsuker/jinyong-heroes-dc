@@ -1,0 +1,19 @@
+{
+  "image": "/assets/jiaxing/tileset.png",
+  "firstGid": 1,
+  "tileSize": 40,
+  "tiles": {
+    "1": {
+      "name": "grass"
+    },
+    "2": {
+      "name": "water"
+    },
+    "3": {
+      "name": "road"
+    },
+    "4": {
+      "name": "bridge"
+    }
+  }
+}

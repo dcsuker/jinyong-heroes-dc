@@ -4,56 +4,22 @@ import { LOCATIONS } from '../data/locations';
 import { CHARACTERS } from '../data/characters';
 import { QUESTS } from '../data/quests';
 import { audioManager } from '../utils/audioManager';
+import { TownRenderer, type TownDebugInfo, type TownInteractionTarget } from '../engine/pixi/TownRenderer';
 
-interface MapSpot {
-  id: string;
-  label: string;
-  x: number;
-  y: number;
-  npcId?: string;
-  kind: 'poi' | 'npc';
-}
-
-interface CollisionRect {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-const JIAXING_SPOTS: MapSpot[] = [
-  { id: 'inn', label: '悦来客栈', x: 24, y: 58, npcId: 'innkeeper', kind: 'npc' },
-  { id: 'market', label: '河街集市', x: 60, y: 44, npcId: 'merchant', kind: 'npc' },
-  { id: 'story', label: '茶楼书棚', x: 42, y: 28, npcId: 'jiaxing_storyteller', kind: 'npc' },
-  { id: 'yamen', label: '巡捕岗亭', x: 74, y: 28, npcId: 'jiaxing_constable', kind: 'npc' },
-  { id: 'dockman', label: '乌篷船埠', x: 76, y: 72, npcId: 'jiaxing_boatman', kind: 'npc' },
-  { id: 'clinic', label: '月河药铺', x: 18, y: 34, npcId: 'jiaxing_doctor', kind: 'npc' },
-  { id: 'yanyu', label: '烟雨楼远眺', x: 56, y: 78, kind: 'poi' },
-  { id: 'iron_spear_temple', label: '铁枪庙旧址', x: 10, y: 66, kind: 'poi' },
-  { id: 'little_penglai', label: '小蓬莱石坊', x: 88, y: 50, kind: 'poi' },
-];
-
-const JIAXING_COLLIDERS: CollisionRect[] = [
-  { x: 12, y: 30, w: 18, h: 32 }, // 客栈街区建筑群
-  { x: 46, y: 24, w: 18, h: 30 }, // 茶楼书棚建筑
-  { x: 70, y: 22, w: 20, h: 30 }, // 巡捕岗亭建筑
-  { x: 56, y: 74, w: 40, h: 18 }, // 南湖近岸水域
-  { x: 84, y: 44, w: 11, h: 15 }, // 小蓬莱石坊内侧
-];
-
-const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
-
-const collidesWithRect = (x: number, y: number, rect: CollisionRect, radius: number) => {
-  const nearestX = clamp(x, rect.x, rect.x + rect.w);
-  const nearestY = clamp(y, rect.y, rect.y + rect.h);
-  return Math.hypot(x - nearestX, y - nearestY) < radius;
+const JIAXING_TRIGGER_LABELS: Record<string, string> = {
+  yuelai_inn: '悦来客栈',
+  tea_house: '茶楼书棚',
+  yamen_post: '巡捕岗亭',
+  nanhu_dock: '南湖船埠',
+  iron_spear_temple: '铁枪庙旧址',
+  little_penglai: '小蓬莱石坊',
+  yanyu_tower: '烟雨楼远眺',
 };
 
 export default function TownScreen() {
   const {
     currentLocation,
     setScreen,
-    setCurrentDialogue,
     activeQuests,
     acceptQuest,
     setFlag,
@@ -61,7 +27,20 @@ export default function TownScreen() {
     addGold,
   } = useGameStore();
   const [message, setMessage] = useState('');
-  const [playerPos, setPlayerPos] = useState({ x: 36, y: 62 });
+  const [debugInfo, setDebugInfo] = useState<TownDebugInfo>({
+    focused: false,
+    nearestId: null,
+    nearestKind: null,
+    nearestLabel: null,
+    nearestDistance: null,
+    canInteract: false,
+    lastKey: null,
+    lastAction: 'init',
+    ts: Date.now(),
+  });
+  const pixiHostRef = useRef<HTMLDivElement | null>(null);
+  const interactionHandlerRef = useRef<(target: TownInteractionTarget) => void>(() => undefined);
+  const dialogueOpeningRef = useRef(false);
 
   const location = LOCATIONS[currentLocation];
   const isJiaxing = currentLocation === 'jiaxing';
@@ -70,11 +49,6 @@ export default function TownScreen() {
     const mapped = audioManager.getBGMForLocation(currentLocation) ?? 'town';
     audioManager.playBGM(mapped);
   }, [currentLocation]);
-
-  useEffect(() => {
-    if (!isJiaxing) return;
-    setPlayerPos({ x: 36, y: 62 });
-  }, [isJiaxing]);
 
   const npcIds = location?.npcs ?? [];
   const previousQuestById = useMemo(() => {
@@ -105,19 +79,42 @@ export default function TownScreen() {
   }, [activeQuests, npcIds, previousQuestById]);
 
   const onTalk = (npcId: string) => {
+    if (dialogueOpeningRef.current) return;
+    if (!CHARACTERS[npcId]) {
+      setMessage(`NPC 数据缺失: ${npcId}`);
+      setTimeout(() => setMessage(''), 1500);
+      return;
+    }
+    dialogueOpeningRef.current = true;
     audioManager.playSFX('talk');
-    setCurrentDialogue(npcId);
-    setScreen('dialogue');
+    useGameStore.setState({ currentDialogue: npcId, screen: 'dialogue' });
+    window.setTimeout(() => {
+      dialogueOpeningRef.current = false;
+    }, 280);
   };
 
   const onQuest = (npcId: string) => {
-    const state = npcQuestState[npcId];
+    const latest = useGameStore.getState();
+    const completed = latest.completedQuests;
+    const state = {
+      canGive: Object.values(QUESTS).some((q) => {
+        if (q.giver !== npcId || latest.activeQuests[q.id] || completed.includes(q.id)) return false;
+        const prev = previousQuestById[q.id];
+        return !prev || completed.includes(prev);
+      }),
+      canComplete: Object.values(latest.activeQuests).some((quest) => {
+        const targetIdx = quest.objectives.findIndex(
+          (obj) => (obj.type === 'talk' || obj.type === 'return') && obj.target === npcId
+        );
+        if (targetIdx < 0) return false;
+        return quest.objectives.every((obj, idx) => idx === targetIdx || obj.progress >= (obj.count ?? 1));
+      }),
+    };
     if (!state) return;
 
     if (state.canGive) {
-      const completed = useGameStore.getState().completedQuests;
       const quest = Object.values(QUESTS).find((q) => {
-        if (q.giver !== npcId || activeQuests[q.id] || completed.includes(q.id)) return false;
+        if (q.giver !== npcId || latest.activeQuests[q.id] || completed.includes(q.id)) return false;
         const prev = previousQuestById[q.id];
         return !prev || completed.includes(prev);
       });
@@ -159,216 +156,102 @@ export default function TownScreen() {
     setTimeout(() => setMessage(''), 2200);
   };
 
+  const progressTalkObjectives = (npcId: string) => {
+    const { activeQuests, updateQuestProgress } = useGameStore.getState();
+    let updated = false;
+    Object.values(activeQuests).forEach((quest) => {
+      quest.objectives.forEach((obj, idx) => {
+        if (obj.type !== 'talk' || obj.target !== npcId) return;
+        const target = obj.count ?? 1;
+        if (obj.progress >= target) return;
+        updateQuestProgress(quest.id, idx, target);
+        updated = true;
+      });
+    });
+    return updated;
+  };
+
   const interactNpc = (npcId: string) => {
-    const state = npcQuestState[npcId];
-    if (state?.canGive || state?.canComplete) {
-      onQuest(npcId);
+    const progressed = progressTalkObjectives(npcId);
+    onQuest(npcId);
+    if (progressed) {
+      setMessage((prev) => prev || '任务进度已更新');
+      setTimeout(() => setMessage(''), 1200);
     }
     onTalk(npcId);
   };
 
-  const triggerPoiEvent = (spot: MapSpot) => {
-    const flagKey = `jiaxing.poi.${spot.id}`;
+  const triggerPoiEventById = (triggerId: string, fallbackLabel: string) => {
+    const label = JIAXING_TRIGGER_LABELS[triggerId] ?? fallbackLabel;
+    const flagKey = `jiaxing.poi.${triggerId}`;
+
     if (!getFlag(flagKey)) {
       setFlag(flagKey, true);
-      if (spot.id === 'yanyu') {
+      if (triggerId === 'yanyu_tower') {
         addGold(20);
         setMessage('你在烟雨楼远眺处发现旧钱囊，获得银两 20。');
-      } else if (spot.id === 'iron_spear_temple') {
+      } else if (triggerId === 'iron_spear_temple') {
         setMessage('铁枪庙旧址香火未绝，似乎藏着旧江湖恩怨。');
-      } else if (spot.id === 'little_penglai') {
+      } else if (triggerId === 'little_penglai') {
         setMessage('小蓬莱石坊题字残缺，或许与某段旧约有关。');
       } else {
-        setMessage(`你调查了 ${spot.label}。`);
+        setMessage(`你调查了 ${label}。`);
       }
     } else {
-      setMessage(`你再次来到 ${spot.label}。`);
+      setMessage(`你再次来到 ${label}。`);
     }
+
     setTimeout(() => setMessage(''), 1800);
   };
 
-  const jiaxingNpcSpots = useMemo(
-    () => JIAXING_SPOTS.filter((s) => s.kind === 'npc' && s.npcId && npcIds.includes(s.npcId)),
-    [npcIds]
-  );
-  const jiaxingPoiSpots = useMemo(() => JIAXING_SPOTS.filter((s) => s.kind === 'poi'), []);
-
-  const pressedKeysRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    if (!isJiaxing) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase();
-      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd'].includes(key)) {
-        e.preventDefault();
-        pressedKeysRef.current.add(key);
-      }
-    };
-
-    const onKeyUp = (e: KeyboardEvent) => {
-      pressedKeysRef.current.delete(e.key.toLowerCase());
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-      pressedKeysRef.current.clear();
-    };
-  }, [isJiaxing]);
-
-  useEffect(() => {
-    if (!isJiaxing) return;
-    let raf = 0;
-    let last = performance.now();
-    const speed = 24;
-    const playerRadius = 2.4;
-
-    const isBlocked = (x: number, y: number) =>
-      JIAXING_COLLIDERS.some((rect) => collidesWithRect(x, y, rect, playerRadius));
-
-    const tick = (now: number) => {
-      const dt = (now - last) / 1000;
-      last = now;
-      const keys = pressedKeysRef.current;
-      let dx = 0;
-      let dy = 0;
-
-      if (keys.has('arrowup') || keys.has('w')) dy -= 1;
-      if (keys.has('arrowdown') || keys.has('s')) dy += 1;
-      if (keys.has('arrowleft') || keys.has('a')) dx -= 1;
-      if (keys.has('arrowright') || keys.has('d')) dx += 1;
-
-      if (dx !== 0 || dy !== 0) {
-        const len = Math.hypot(dx, dy);
-        const step = speed * dt;
-        const vx = (dx / len) * step;
-        const vy = (dy / len) * step;
-
-        setPlayerPos((prev) => {
-          const targetX = clamp(prev.x + vx, 6, 94);
-          const targetY = clamp(prev.y + vy, 8, 92);
-
-          const allowX = !isBlocked(targetX, prev.y);
-          const allowY = !isBlocked(prev.x, targetY);
-
-          const nextX = allowX ? targetX : prev.x;
-          const nextY = allowY ? targetY : prev.y;
-
-          if (!allowX && !allowY) {
-            return prev;
-          }
-
-          return { x: nextX, y: nextY };
-        });
-      }
-
-      raf = requestAnimationFrame(tick);
-    };
-
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [isJiaxing]);
-
-  const nearbySpot = useMemo(() => {
-    if (!isJiaxing) return null;
-    let nearest: { spot: MapSpot; dist: number } | null = null;
-    for (const spot of [...jiaxingNpcSpots, ...jiaxingPoiSpots]) {
-      const dist = Math.hypot(playerPos.x - spot.x, playerPos.y - spot.y);
-      if (dist <= 8.8 && (!nearest || dist < nearest.dist)) {
-        nearest = { spot, dist };
-      }
-    }
-    return nearest?.spot ?? null;
-  }, [isJiaxing, jiaxingNpcSpots, jiaxingPoiSpots, playerPos]);
-
-  useEffect(() => {
-    if (!isJiaxing) return;
-    const onInteract = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() !== 'e') return;
-      if (!nearbySpot) {
-        setMessage('附近没有可互动目标');
-        setTimeout(() => setMessage(''), 1200);
+  interactionHandlerRef.current = (target: TownInteractionTarget) => {
+    if (dialogueOpeningRef.current) return;
+    if (target.kind === 'npc') {
+      if (npcIds.includes(target.id)) {
+        interactNpc(target.id);
         return;
       }
-      if (nearbySpot.kind === 'npc' && nearbySpot.npcId) {
-        interactNpc(nearbySpot.npcId);
-      } else {
-        triggerPoiEvent(nearbySpot);
+      setMessage(`无法与 ${target.label} 互动。`);
+      setTimeout(() => setMessage(''), 1200);
+      return;
+    }
+
+    triggerPoiEventById(target.id, target.label);
+  };
+
+  useEffect(() => {
+    if (!isJiaxing || !pixiHostRef.current) return;
+    const savedPos = (() => {
+      const raw = getFlag('jiaxing.playerTile');
+      if (typeof raw !== 'string') return undefined;
+      const [sx, sy] = raw.split(',').map((v) => Number(v.trim()));
+      if (!Number.isFinite(sx) || !Number.isFinite(sy)) return undefined;
+      return { x: sx, y: sy };
+    })();
+
+    const renderer = new TownRenderer({
+      onInteract: (target) => interactionHandlerRef.current(target),
+      onDebug: (info) => setDebugInfo(info),
+      initialPlayerTile: savedPos,
+    });
+
+    renderer.mount(pixiHostRef.current).catch((error: unknown) => {
+      const msg = error instanceof Error ? error.message : 'unknown error';
+      setMessage(`Pixi 初始化失败: ${msg}`);
+    });
+
+    return () => {
+      try {
+        const pos = renderer.getPlayerTilePosition();
+        if (pos) {
+          setFlag('jiaxing.playerTile', `${pos.x},${pos.y}`);
+        }
+        renderer.destroy();
+      } catch (error) {
+        console.error('Town renderer destroy failed:', error);
       }
     };
-
-    window.addEventListener('keydown', onInteract);
-    return () => window.removeEventListener('keydown', onInteract);
-  }, [isJiaxing, nearbySpot]);
-
-  const renderJiaxingMap = () => (
-    <div className="relative h-[520px] rounded-xl overflow-hidden border border-gold/30 bg-stone-900 select-none">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(217,119,6,0.2),transparent_42%),radial-gradient(circle_at_82%_78%,rgba(56,189,248,0.18),transparent_46%),linear-gradient(145deg,#171513,#23201d_55%,#1a1815)]" />
-
-      <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M4 76 C 18 70, 34 72, 48 74 C 66 77, 82 73, 96 80" fill="none" stroke="#64748b" strokeWidth="2.2" />
-        <path d="M12 30 L30 40 L40 56 L26 62 L12 52 Z" fill="#302c27" opacity="0.55" />
-        <path d="M46 24 L64 32 L76 46 L60 54 L46 42 Z" fill="#302c27" opacity="0.52" />
-        <path d="M70 22 L84 28 L90 40 L82 52 L70 46 Z" fill="#302c27" opacity="0.5" />
-        <path d="M38 34 L48 40 L58 46" fill="none" stroke="#f59e0b" strokeWidth="1" opacity="0.25" />
-      </svg>
-
-      <div className="absolute top-3 left-3 text-xs px-2 py-1 rounded bg-ink-dark/85 border border-gold/30 text-amber-200">
-        嘉兴城内图（WASD/方向键移动，E 互动）
-      </div>
-
-      {JIAXING_SPOTS.map((spot) => {
-        const npc = spot.npcId ? CHARACTERS[spot.npcId] : null;
-        const isNear = nearbySpot?.id === spot.id;
-        return (
-          <button
-            key={spot.id}
-            onClick={() => {
-              if (spot.kind === 'npc' && spot.npcId) interactNpc(spot.npcId);
-              else triggerPoiEvent(spot);
-            }}
-            className="absolute -translate-x-1/2 -translate-y-1/2 group"
-            style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
-            title={spot.label}
-          >
-            <span
-              className={`block w-4 h-4 rounded-full border-2 transition-all ${
-                spot.kind === 'npc'
-                  ? isNear
-                    ? 'bg-green-400 border-green-100 shadow-[0_0_14px_rgba(74,222,128,0.8)] scale-110'
-                    : 'bg-amber-400 border-amber-100 shadow-[0_0_12px_rgba(251,191,36,0.65)] group-hover:scale-125'
-                  : isNear
-                  ? 'bg-sky-400 border-sky-100 shadow-[0_0_14px_rgba(56,189,248,0.72)] scale-110'
-                  : 'bg-sky-400/80 border-sky-100 shadow-[0_0_10px_rgba(56,189,248,0.48)] group-hover:scale-110'
-              }`}
-            />
-            <span className="absolute left-1/2 top-5 -translate-x-1/2 whitespace-nowrap text-[11px] px-2 py-0.5 rounded bg-ink-dark/90 border border-amber-700/30 text-amber-100 opacity-90 group-hover:opacity-100">
-              {npc ? `${npc.portrait} ${npc.name}` : spot.label}
-            </span>
-          </button>
-        );
-      })}
-
-      <div
-        className="absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-emerald-500 border-2 border-emerald-100 shadow-[0_0_14px_rgba(16,185,129,0.8)] flex items-center justify-center text-sm"
-        style={{ left: `${playerPos.x}%`, top: `${playerPos.y}%` }}
-        title="主角"
-      >
-        🧑
-      </div>
-
-      {nearbySpot && (
-        <div className="absolute bottom-3 left-3 text-xs text-green-300 bg-ink-dark/85 px-2 py-1 rounded border border-green-700/40">
-          按 E 互动：{nearbySpot.label}
-        </div>
-      )}
-      <div className="absolute bottom-3 right-3 text-[11px] text-parchment/75 bg-ink-dark/80 px-2 py-1 rounded border border-gold/20">
-        金色点: NPC | 蓝色点: 地标
-      </div>
-    </div>
-  );
+  }, [getFlag, isJiaxing, setFlag]);
 
   if (isJiaxing) {
     return (
@@ -387,8 +270,27 @@ export default function TownScreen() {
         </div>
 
         <div className="flex-1 p-6 overflow-y-auto">
-          {message && <p className="mb-4 text-gold">{message}</p>}
-          {renderJiaxingMap()}
+          {message && <p className="mb-4 text-gold text-lg">{message}</p>}
+
+          <div className="relative h-[720px] rounded-xl overflow-hidden border border-gold/30 bg-stone-900 select-none">
+            <div ref={pixiHostRef} className="absolute inset-0" />
+
+            <div className="pointer-events-none absolute top-3 left-3 text-sm px-3 py-1.5 rounded bg-ink-dark/85 border border-gold/30 text-amber-200">
+              嘉兴城内图（WASD/方向键移动，空格互动）
+            </div>
+
+            <div className="pointer-events-none absolute bottom-3 right-3 text-sm text-parchment/75 bg-ink-dark/80 px-3 py-1.5 rounded border border-gold/20">
+              金色方块: NPC | 蓝色方块: 地标
+            </div>
+
+            <div className="pointer-events-none absolute left-3 bottom-3 max-w-[55%] text-xs leading-5 bg-black/70 border border-green-600/60 text-green-200 rounded px-3 py-2">
+              <div>DEBUG 焦点: {debugInfo.focused ? '画布已聚焦' : '未聚焦(先点击地图)'}</div>
+              <div>DEBUG 最近目标: {debugInfo.nearestLabel ?? '-'} [{debugInfo.nearestKind ?? '-'}]</div>
+              <div>DEBUG 目标ID: {debugInfo.nearestId ?? '-'} | 距离: {debugInfo.nearestDistance?.toFixed(1) ?? '-'}</div>
+              <div>DEBUG 可交互: {debugInfo.canInteract ? '是' : '否'} | 按键: {debugInfo.lastKey ?? '-'}</div>
+              <div>DEBUG 最后动作: {debugInfo.lastAction}</div>
+            </div>
+          </div>
         </div>
       </div>
     );
